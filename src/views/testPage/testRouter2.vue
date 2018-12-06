@@ -2,7 +2,7 @@
   <div>
     <div>test router 2 {{Math.random() * 1000}}</div>
     <v-btn @click="goDetails">test query</v-btn>
-    <v-btn @click="goDetailsParams">test params</v-btn>
+    <!--<v-btn @click="goDetailsParams">test params</v-btn>-->
   </div>
 </template>
 
