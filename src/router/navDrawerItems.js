@@ -6,17 +6,17 @@ let navDrawerItems = [
   {
     icon: 'mdi-file-document-box-multiple',
     label: 'Components',
-    to: ''
+    to: '/documents/components'
   },
   {
     icon: 'mdi-function',
     label: 'Functions',
-    to: ''
+    to: '/documents/functions'
   },
   {
     icon: 'mdi-function-variant',
     label: 'Store',
-    to: ''
+    to: '/documents/store'
   },
   {divider: true},
   {heading: 'Debug'},
@@ -30,6 +30,8 @@ let navDrawerItems = [
     ]
   },
   {
+    access: ['Re'],
+    hidden: true,
     icon: 'mdi-cellphone-android',
     label: 'Test Component',
     to: '/test-components/test-component-page'

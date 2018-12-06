@@ -2,9 +2,9 @@
   <v-app :dark="dark">
     <v-toolbar :color="dark?'':'blue-grey darken-4'" app dense>
       <v-toolbar-title>
-        <span :class="'primary--text'">{{$L.cfg.appName.full}}</span>
+        <span :class="'primary--text'">{{$L.cfg.appName.subTitle}}</span>
         <span class="px-2 white--text font-weight-light">|</span>
-        <span class=" white--text font-weight-light">{{$L.cfg.appName.subTitle}}</span>
+        <span class=" white--text font-weight-light">{{$L.cfg.appName.full}}</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn @click="dark = !dark" icon>

@@ -121,7 +121,7 @@ export default {
       // console.log('refresh')
       this.refreshDom()
       // this.setOverflowY('auto')
-    }, 400)
+    }, 500)
   }
 }
 </script>

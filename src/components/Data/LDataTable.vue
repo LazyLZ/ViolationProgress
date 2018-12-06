@@ -266,12 +266,12 @@
 <script>
 import LExpandTransitionGroup from '../Transition/LExpandTransitionGroup'
 import debounce from 'lodash/debounce'
-import LSelectTime from '../Time/LSelectTime'
-import LSelectDatetime from '../Time/LSelectDatetime'
-import LSelectWeekday from '../Time/LSelectWeekday'
-import LSelectDatetimeDuration from '../Time/LSelectDatetimeDuration'
+import LSelectTime from '../Inputs/Time/LSelectTime'
+import LSelectDatetime from '../Inputs/Time/LSelectDatetime'
+import LSelectWeekday from '../Inputs/Time/LSelectWeekday'
+import LSelectDatetimeDuration from '../Inputs/Time/LSelectDatetimeDuration'
 // import {logger} from '../utils/logger'
-import LSelectDate from '../Time/LSelectDate'
+import LSelectDate from '../Inputs/Time/LSelectDate'
 
 let logger = {
   debug: console.log,

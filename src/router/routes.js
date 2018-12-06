@@ -112,7 +112,7 @@ export default [
         component: testRouter1,
         meta: {
           label: '固定页面',
-          persistent: true
+          // persistent: true
         }
       },
       {
@@ -190,6 +190,40 @@ export default [
           icon: 'mdi-cellphone-android'
         }
       }
+    ]
+  },
+  {
+    path: '/documents',
+    component: Main,
+    meta: {
+      disabled: true,
+      label: '文档'
+    },
+    children: [
+      {
+        path: 'components',
+        component: () => import('../views/Documents/componentsDoc'),
+        meta: {
+          label: '通用组件',
+          icon: 'mdi-file-document-box-multiple'
+        }
+      },
+      {
+        path: 'functions',
+        component: () => import('../views/Documents/functionsDoc'),
+        meta: {
+          label: '通用函数',
+          icon: 'mdi-function'
+        }
+      },
+      {
+        path: 'store',
+        component: () => import('../views/Documents/storeDoc'),
+        meta: {
+          label: '通用状态',
+          icon: 'mdi-function-variant'
+        }
+      },
     ]
   },
   {
