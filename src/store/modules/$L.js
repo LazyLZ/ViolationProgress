@@ -81,13 +81,23 @@ const mutations = {
   changeTab (state, tabs) {
     state.mainTabItems = tabs
   },
+  moveTab (state, {from, to}) {
+    let insertIndex = from > to ? to + 1 : to
+    let temp = state.mainTabItems[from]
+    // console.log(`delete ${from}, insert at ${insertIndex}`)
+    // console.log(state.mainTabItems.map(t => t.key))
+    state.mainTabItems.splice(from, 1)
+    // console.log(state.mainTabItems.map(t => t.key))
+    state.mainTabItems.splice(insertIndex, 0, temp)
+    // console.log(state.mainTabItems.map(t => t.key))
+  },
   recoveryTab (state, routeNow) {
     // 暂时仅恢复主页
     let tabNow = routeToTab(routeNow)
     let tabs = getPersistentTab()
     let localTabs = F.getFromLocal('$mainTabItems') || []
     localTabs.forEach(t => {
-      if (!tabs.find(tab => tab.key === t.key)) {
+      if (!tabs.find(tab => tab.to === t.to)) {
         tabs.push(t)
       }
     })
@@ -99,7 +109,7 @@ const mutations = {
     //     persistent: true,
     //   })
     // }
-    if (tabNow && !tabs.find(t => t.key === tabNow.key)) {
+    if (tabNow && !tabs.find(t => t.to === tabNow.to)) {
       tabs.push(tabNow)
     }
     console.log('recover', tabs)

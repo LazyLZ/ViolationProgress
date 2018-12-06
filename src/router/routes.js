@@ -176,6 +176,7 @@ export default [
   },
   {
     path: '/test-components',
+    name: 'TestComponentsParent',
     component: Main,
     meta: {
       hideInBread: true,
@@ -183,6 +184,7 @@ export default [
     },
     children: [
       {
+        name: 'TestComponents',
         path: 'test-component-page',
         component: () => import('../views/testPage/testComponents'),
         meta: {
@@ -195,12 +197,14 @@ export default [
   {
     path: '/documents',
     component: Main,
+    name: 'Documents',
     meta: {
       disabled: true,
       label: '文档'
     },
     children: [
       {
+        name: 'ComponentsDoc',
         path: 'components',
         component: () => import('../views/Documents/componentsDoc'),
         meta: {
@@ -209,6 +213,7 @@ export default [
         }
       },
       {
+        name: 'FunctionsDoc',
         path: 'functions',
         component: () => import('../views/Documents/functionsDoc'),
         meta: {
@@ -217,6 +222,7 @@ export default [
         }
       },
       {
+        name: 'StoreDoc',
         path: 'store',
         component: () => import('../views/Documents/storeDoc'),
         meta: {
