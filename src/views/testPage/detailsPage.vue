@@ -3,9 +3,9 @@
     <template slot-scope="{data, id}">
       <h1>details page {{id}} {{data}} {{data === null}}</h1>
     </template>
-    <!--<template slot="loading">-->
-      <!--<v-progress-circular size="50" indeterminate></v-progress-circular>-->
-    <!--</template>-->
+    <template slot="loading">
+      <v-progress-circular size="50" indeterminate></v-progress-circular>
+    </template>
   </l-cache>
 </template>
 

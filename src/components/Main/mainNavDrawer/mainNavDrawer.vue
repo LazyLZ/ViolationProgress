@@ -10,16 +10,16 @@
     v-model="drawerModel"
   >
     <!--系统logo区域-->
-    <v-layout align-center class="headline" style="height: 96px">
+    <v-layout align-center style="height: 96px">
       <v-flex align-center justify-center layout v-if="!smallScreen && !mainNavDrawer">
         <v-avatar>
           <img alt="logo" src="@/assets/lazylz_avatar.jpg"/>
         </v-avatar>
       </v-flex>
-      <v-flex v-else>
-        <span class="primary--text pl-3">{{$L.cfg.appName.full}}</span>
-        <span class="px-2 font-weight-light white--text">|</span>
-        <span class="font-weight-light white--text">{{$L.cfg.appName.subTitle}}</span>
+      <v-flex class="pl-3 pt-4" v-else layout column>
+        <div class="title white--text">{{$L.cfg.appName.full}}</div>
+        <!--<span class="px-2 font-weight-light white&#45;&#45;text">|</span>-->
+        <div class="font-weight-light pt-1 subheading primary--text ">{{$L.cfg.appName.subTitle}}</div>
       </v-flex>
     </v-layout>
 
