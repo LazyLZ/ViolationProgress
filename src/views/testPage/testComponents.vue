@@ -1,14 +1,15 @@
 <template>
   <v-container fluid>
-    <v-layout row justify-center>
-      <v-flex md12 lg10>
+    <v-layout justify-center row>
+      <v-flex lg10 md12>
         <l-data-table
-          title-text="测试列表"
+          :get-data-func="getData"
           :headers="vheaders"
-          :items="items"
+          title-text="测试列表"
         ></l-data-table>
       </v-flex>
     </v-layout>
+    <v-btn @click="post">test post</v-btn>
   </v-container>
 </template>
 <script>
@@ -19,10 +20,10 @@ export default {
   components: {LDataTable},
   data: () => ({
     vheaders: [
-      {text: '车辆号牌', value: 'plate', align: 'left'},
-      {text: '手机号码', value: 'ownerTel', align: 'right'},
-      {text: '车主姓名', value: 'ownerName', align: 'right'},
-      {text: '所在单位', value: 'ownerOrg', align: 'right'},
+      {text: '车辆号牌', value: 'carNumber', align: 'left'},
+      {text: '车主姓名', value: 'name', align: 'right'},
+      {text: '违章区域', value: 'area', align: 'right'},
+      {text: '违章状态', value: 'status', align: 'right'},
     ],
     items: [
       {plate: '川ALZ000', ownerTel: '18611111111', ownerName: 'LZ', ownerOrg: 'UESTC'},
@@ -35,7 +36,22 @@ export default {
       {plate: '川ALZ007', ownerTel: '18611111111', ownerName: 'LZ', ownerOrg: 'UESTC'},
       {plate: '川ALZ008', ownerTel: '18611111111', ownerName: 'LZ', ownerOrg: 'UESTC'},
     ]
-  })
+  }),
+  methods: {
+    async post () {
+      this.$axios.post('/passApi/pass/log/list', {}, {
+      })
+    },
+    async getData ({pagination, sortStack, filterItems, titleSwitch, search}) {
+      let url = '/api/peccancy/getAll'
+      try {
+        return this.$store.dispatch('getDataList', {pagination, url})
+      }
+      catch (e) {
+        this.$store.dispatch('alert', {type: 'error', title: '获取列表时发生错误', message: e.message})
+      }
+    }
+  }
 }
 </script>
 
