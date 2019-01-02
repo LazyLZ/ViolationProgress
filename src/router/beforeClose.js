@@ -1,4 +1,4 @@
-import store from '../store'
+import store from '../store/index'
 
 let defaultBeforeClose = function () {
   return new Promise((resolve) => {

@@ -136,7 +136,7 @@ export default {
     errorMessages: {type: [String, Array], default: () => []},
     rules: {type: Array, default: () => []},
     validateOnBlur: {type: Boolean, default: true},
-    prependIcon: {type: String, default: 'directions_car'},
+    prependIcon: {type: String, default: '$vuetify.icons.car'},
   },
   data: () => ({
     menu: false,

@@ -32,7 +32,7 @@ export default {
   components: {LOperationDialog},
   props: {
     value: {},
-    title: {type: String, default: '发生错误'},
+    title: {type: String, default: ''},
     errorTitle: {type: String, default: '发生错误'},
     errorMessage: {type: String, default: ''},
   },

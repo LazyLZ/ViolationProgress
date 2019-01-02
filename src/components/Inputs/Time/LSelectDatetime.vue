@@ -14,7 +14,6 @@
       slot="activator"
       :disabled="disabled"
       :clearable="!readonly"
-      clear-icon="clear"
       v-model="datetimeFormatted"
       :label="label"
       :error="error"
@@ -22,7 +21,7 @@
       :hint="hint?hint:'格式：YYYY-MM-DD hh:mm'"
       persistent-hint
       @keyup.enter="menu = false"
-      :prepend-icon="hideIcon ? '':'event'"
+      :prepend-icon="hideIcon ? '':'$vuetify.icons.datetime'"
     ></v-text-field>
     <v-card>
       <v-card-text class="px-0 py-0">

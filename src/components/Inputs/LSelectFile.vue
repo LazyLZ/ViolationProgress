@@ -1,144 +1,143 @@
 <template>
-  <div class="d-inline-block">
-    <div v-if="buttonSelect && haveActivator" @click.stop="selectFile" class="d-inline-block">
-      <slot name="activator">
-        <!--<v-btn>{{title}}</v-btn>-->
-      </slot>
-    </div>
-    <!--<v-btn-->
-    <!--v-if="buttonSelect"-->
-    <!--:color="color"-->
-    <!--@click="selectFile()"-->
-    <!--:flat="flat"-->
-    <!--:small="small"-->
-    <!--:large="large"-->
-    <!--:medium="medium"-->
-    <!--:disabled="readonly"-->
-    <!--&gt;{{title}}-->
-    <!--</v-btn>-->
-    <template v-else-if="dialogSelect">
-      <span class="d-inline-block" @click.stop="dialog.activate = true">
-        <slot name="activator"></slot>
-      </span>
-      <v-dialog scrollable v-model="dialog.activate" persistent :max-width="dialogProps.maxWidth || '600px'">
-        <v-card flat>
-          <v-card-title style="height: 64px">
-            <slot name="title">
-              <span class="title py-1">{{dialogProps.title || dialogTitleText}}</span>
-              <!--<span>{{dialogProps}}</span>-->
-            </slot>
-          </v-card-title>
-          <v-progress-linear
-            class="py-0 my-0"
-            v-if="dialogProps.loading"
-            height="2"
-            :value="dialogProps.progress"
-            :indeterminate="!dialogProps.hasOwnProperty('progress')"
-          ></v-progress-linear>
-          <v-divider v-else></v-divider>
-          <v-card-text :style="{maxHeight: dialogProps.maxHeight || '600px'}">
-            <v-container fluid class="py-0 px-0">
-              <slot></slot>
-              <slot name="before-drag"></slot>
-              <v-layout
-                style="min-height: 300px"
-                justify-center align-center column
-                id="dragArea"
-                ref="dragArea"
-                fill-height
-                @dragenter.prevent.stop="dragInBox"
-                @dragleave.prevent.stop="dragOutBox"
-                @drop.prevent.stop="getFile"
-                @dragover.prevent
-                :class="dragAreaColor">
-                <div :style="preventPointer">
-                  <v-layout column align-center>
-                    <!--<v-scale-transition>-->
-                    <span v-if="readonly && files.length === 0">没有选择文件</span>
-                    <span
-                      v-else-if="files.length === 0"
-                      class="subheading grey--text"
-                    >{{dragIn?'松开上传':'拖拽到此处'}}</span>
-                    <v-layout row wrap align-center justify-center v-else>
-                      <v-flex :style="{width: dialogProps.maxWidth ? dialogDropWidth : '500px'}"
-                              xs12 :key="i+name" v-for="(name, i) in files.map(f => f.name)">
-                        <div
-                          style="word-wrap: break-word; word-break: break-all"
-                          class="text-xs-center grey--text text--darken-2 subheading"
-                        >{{name}}
-                        </div>
-                      </v-flex>
-                    </v-layout>
-                    <!--</v-scale-transition>-->
-                    <!--<v-btn flat color="primary">选择文件</v-btn>-->
-                    <div>
-                      <span v-if="errorData.error && hadChose" class="error--text">{{errorData.message}}</span>
-                      <span v-else class="caption grey--text">{{hint || ''}}</span>
-                    </div>
-                    <v-scale-transition>
-                      <v-btn
-                        :disabled="readonly"
-                        color="primary"
-                        @click="selectFile()"
-                        flat
-                      >{{label}}
-                      </v-btn>
-                    </v-scale-transition>
-                  </v-layout>
-                </div>
-              </v-layout>
-              <slot name="after-drag"></slot>
-            </v-container>
-          </v-card-text>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              large
-              flat
-              color="grey"
-              @click="cancel()"
-            >{{dialogProps.cancelText || '取消'}}
-            </v-btn>
-            <v-btn
-              :disabled="errorInput"
-              :loading="dialogProps.loading"
-              large
-              flat
-              color="primary"
-              @click="submit()"
-            >{{dialogProps.confirmText || '确认'}}
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </template>
-    <div v-else-if="inputSelect" @click.stop="selectFile()">
-      <v-autocomplete
-        item-disabled
-        :prepend-icon="prependIcon"
-        :rules="rules"
-        :readonly="files.length === 0 || readonly"
-        :label="label"
-        multiple
-        :hint="hint"
-        :items="files && files.map(f => f.name)"
-        v-model="files"
-        item-text="name"
-        :chips="multiple"
-        :deletable-chips="multiple"
-        hide-selected
-        hide-no-data
-        return-object
-        :small-chips="multiple"
-        :search-input.sync="hideInput"
-      >
-      </v-autocomplete>
-    </div>
-    <!--<v-flex class="grey" style="height: 100px">-->
-    <!--<div ref="imggg"><div></div></div>-->
-    <!--</v-flex>-->
+  <!--<v-flex class="d-inline-block">-->
+  <div @click.stop="selectFile" class="d-inline-block" v-if="buttonSelect && haveActivator">
+    <slot name="activator">
+      <!--<v-btn>{{title}}</v-btn>-->
+    </slot>
   </div>
+  <!--<v-btn-->
+  <!--v-if="buttonSelect"-->
+  <!--:color="color"-->
+  <!--@click="selectFile()"-->
+  <!--:flat="flat"-->
+  <!--:small="small"-->
+  <!--:large="large"-->
+  <!--:medium="medium"-->
+  <!--:disabled="readonly"-->
+  <!--&gt;{{title}}-->
+  <!--</v-btn>-->
+  <v-dialog :max-width="dialogProps.maxWidth || '600px'" persistent scrollable v-else-if="dialogSelect"
+            v-model="dialog.activate">
+        <!--<span @click.stop="dialog.activate = true" class="d-inline-block">-->
+        <slot name="activator" slot="activator"></slot>
+      <!--</span>-->
+    <v-card flat>
+      <v-card-title style="height: 64px">
+        <slot name="title">
+          <span class="title py-1">{{dialogProps.title || dialogTitleText}}</span>
+          <!--<span>{{dialogProps}}</span>-->
+        </slot>
+      </v-card-title>
+      <v-progress-linear
+        :indeterminate="!dialogProps.hasOwnProperty('progress')"
+        :value="dialogProps.progress"
+        class="py-0 my-0"
+        height="2"
+        v-if="dialogProps.loading"
+      ></v-progress-linear>
+      <v-divider v-else></v-divider>
+      <v-card-text :style="{maxHeight: dialogProps.maxHeight || '600px'}">
+        <v-container class="py-0 px-0" fluid>
+          <slot></slot>
+          <slot name="before-drag"></slot>
+          <v-layout
+            :class="dragAreaColor"
+            @dragenter.prevent.stop="dragInBox" @dragleave.prevent.stop="dragOutBox" @dragover.prevent
+            @drop.prevent.stop="getFile"
+            align-center
+            column
+            fill-height
+            id="dragArea"
+            justify-center
+            ref="dragArea"
+            style="min-height: 300px">
+            <div :style="preventPointer">
+              <v-layout align-center column>
+                <!--<v-scale-transition>-->
+                <span v-if="readonly && files.length === 0">没有选择文件</span>
+                <span
+                  class="subheading grey--text"
+                  v-else-if="files.length === 0"
+                >{{dragIn?'松开上传':'拖拽到此处'}}</span>
+                <v-layout align-center justify-center row v-else wrap>
+                  <v-flex :key="i+name"
+                          :style="{width: dialogProps.maxWidth ? dialogDropWidth : '500px'}" v-for="(name, i) in files.map(f => f.name)" xs12>
+                    <div
+                      class="text-xs-center grey--text text--darken-2 subheading"
+                      style="word-wrap: break-word; word-break: break-all"
+                    >{{name}}
+                    </div>
+                  </v-flex>
+                </v-layout>
+                <!--</v-scale-transition>-->
+                <!--<v-btn flat color="primary">选择文件</v-btn>-->
+                <div>
+                  <span class="error--text" v-if="errorData.error && hadChose">{{errorData.message}}</span>
+                  <span class="caption grey--text" v-else>{{hint || ''}}</span>
+                </div>
+                <v-scale-transition>
+                  <v-btn
+                    :disabled="readonly"
+                    @click="selectFile()"
+                    color="primary"
+                    flat
+                  >{{label}}
+                  </v-btn>
+                </v-scale-transition>
+              </v-layout>
+            </div>
+          </v-layout>
+          <slot name="after-drag"></slot>
+        </v-container>
+      </v-card-text>
+      <v-divider></v-divider>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          @click="cancel()"
+          color="grey"
+          flat
+          large
+        >{{dialogProps.cancelText || '取消'}}
+        </v-btn>
+        <v-btn
+          :disabled="errorInput"
+          :loading="dialogProps.loading"
+          @click="submit()"
+          color="primary"
+          flat
+          large
+        >{{dialogProps.confirmText || '确认'}}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <div @click.stop="selectFile()" v-else-if="inputSelect">
+    <v-autocomplete
+      :chips="multiple"
+      :deletable-chips="multiple"
+      :hint="hint"
+      :items="files && files.map(f => f.name)"
+      :label="label"
+      :prepend-icon="prependIcon"
+      :readonly="files.length === 0 || readonly"
+      :rules="rules"
+      :search-input.sync="hideInput"
+      :small-chips="multiple"
+      hide-no-data
+      hide-selected
+      item-disabled
+      item-text="name"
+      multiple
+      return-object
+      v-model="files"
+    >
+    </v-autocomplete>
+  </div>
+  <!--<v-flex class="grey" style="height: 100px">-->
+  <!--<div ref="imggg"><div></div></div>-->
+  <!--</v-flex>-->
+  <!--</v-flex>-->
 </template>
 
 <script>
@@ -172,7 +171,7 @@ export default {
     fileType: {type: String, default: ''},
     label: {type: String, default: '选择文件'},
     color: {type: String, default: 'primary'},
-    prependIcon: {type: String, default: 'description'},
+    prependIcon: {type: String, default: '$vuetify.icons.file'},
     hint: {type: String, default: ''},
     nameSplit: {type: String, default: '\n'},
     rules: {type: Array, default: () => ([])},
@@ -228,7 +227,7 @@ export default {
     dialogDropWidth () {
       if (this.dialogProps.maxWidth) {
         let text = this.dialogProps.maxWidth
-        text.replace(/\d+/i, (word) => Number.isNaN(Number(word)) ? 500 : Math.max(50, Number(word) - 100))
+        return text.replace(/\d+/i, (word) => Number.isNaN(Number(word)) ? 500 : Math.max(50, Number(word) - 100))
       }
       else {
         return '500px'
@@ -506,6 +505,7 @@ export default {
     if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
       console.error('The File APIs are not fully supported in this browser.')
     }
+    // console.log(this.$slots)
   },
   mounted () {
     // let dropbox = document.querySelector('#dragArea')

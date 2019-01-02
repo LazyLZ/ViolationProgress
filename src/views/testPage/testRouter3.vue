@@ -18,9 +18,11 @@
     <l-success-dialog>
       <v-btn slot="activator">trigger success</v-btn>
     </l-success-dialog>
-    <l-alert type="success snackbar dialog">
+    <l-alert type="success snackbar">
       <v-btn slot="activator">alert</v-btn>
     </l-alert>
+    <v-btn @click="$store.dispatch('alert', {type: 'success', message:'test'})">global</v-btn>
+    <v-btn @click="$store.dispatch('closeAlert')">close</v-btn>
     <v-btn @click="testLogout">logout</v-btn>
   </div>
 </template>

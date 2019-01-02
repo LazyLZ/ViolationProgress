@@ -20,10 +20,9 @@
       hint="格式: 24h hh:mm"
       persistent-hint
       :rules="[...rules, timeRule]"
-      :prepend-icon="hideIcon ? '' : 'access_time'"
+      :prepend-icon="hideIcon ? '' : '$vuetify.icons.time'"
       :clearable="!readonly"
       :error="error"
-      clear-icon="clear"
       @blur="date = parseTime(timeFormatted)"
       @close="date = parseTime(timeFormatted)"
       @keyup.enter="date = parseTime(timeFormatted)"

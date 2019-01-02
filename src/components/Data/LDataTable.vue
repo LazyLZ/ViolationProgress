@@ -27,7 +27,7 @@
       <v-tooltip bottom>
         <v-btn @click.stop="filter = !filter" icon slot="activator" v-if="filterItems && !persistentFilter"
                v-model="filter">
-          <v-icon>filter_list</v-icon>
+          <v-icon>$vuetify.icons.filter</v-icon>
         </v-btn>
         <span>筛选</span>
       </v-tooltip>
@@ -37,14 +37,14 @@
           icon
           slot="activator"
         >
-          <v-icon>mdi-refresh</v-icon>
+          <v-icon>$vuetify.icons.refresh</v-icon>
         </v-btn>
         <span>刷新</span>
       </v-tooltip>
       <slot name="title-action"></slot>
     </v-card-title>
     <v-divider></v-divider>
-    <l-expand-transition-group>
+    <v-expand-transition>
       <div :key="'filter'" class="filter" v-if="filter">
 
         <!--筛选插槽-->
@@ -52,97 +52,24 @@
           <v-container class="pb-3" fluid grid-list-md v-if="filterItems && filterItems.length > 0">
             <v-form ref="filterForm">
               <v-layout row wrap>
-                <v-flex :class="item.layout" :key="'flex' + i" :ref="'filter' + i" lg4 v-for="(item, i) in filterItems"
-                        xl4>
-                  <template v-if="item.type === 'select'">
-                    <v-select
-                      :hint="item.hint"
-                      :item-text="item.itemText || 'text'"
-                      :item-value="item.itemValue || 'value'"
-                      :items="item.items"
-                      :label="item.label"
-                      :multiple="item.multiple"
-                      :prepend-icon="item.icon"
-                      :readonly="item.readonly"
-                      :return-object="item.returnObject || false"
-                      :rules="item.rules || []"
-                      v-model="item.value"
-                    ></v-select>
-                  </template>
-                  <template v-else-if="item.type==='textarea'">
-                    <v-text-field
-                      :hint="item.hint"
-                      :label="item.label"
-                      :prepend-icon="item.icon"
-                      :readonly="item.readonly"
-                      :rows="1"
-                      :rules="item.rules"
-                      auto-grow
-                      v-model="item.value"
-                    ></v-text-field>
-                  </template>
-                  <template v-else-if="item.type==='select-time' || item.type==='selectTime'">
-                    <l-select-time
-                      :label="item.label"
-                      :readonly="item.readonly"
-                      :rules="items.rules"
-                      v-model="item.value"
-                    ></l-select-time>
-                  </template>
-                  <template v-else-if="item.type==='select-date' || item.type==='selectDate'">
-                    <l-select-date
-                      :label="item.label"
-                      :readonly="item.readonly"
-                      :rules="items.rules"
-                      v-model="item.value"
-                    ></l-select-date>
-                  </template>
-                  <template v-else-if="item.type==='select-datetime' || item.type==='selectDatetime'">
-                    <l-select-datetime
-                      :label="item.label"
-                      :readonly="item.readonly"
-                      :rules="items.rules"
-                      v-model="item.value"
-                    ></l-select-datetime>
-                  </template>
-                  <template v-else-if="item.type==='select-weekday' || item.type==='selectWeekday'">
-                    <l-select-weekday
-                      :label="item.label"
-                      :mode="item.weekdayMode"
-                      :multiple="item.multiple"
-                      :readonly="item.readonly"
-                      :return-number="item.returnNumber"
-                      :rules="items.rules"
-                      :start-number="item.startNumber"
-                      v-model="item.value"
-                    ></l-select-weekday>
-                  </template>
-                  <template v-else-if="item.type==='select-datetime-duration' || item.type==='selectDatetimeDuration'">
-                    <l-select-datetime-duration
-                      :label="item.label"
-                      :readonly="item.readonly"
-                      :rules="items.rules"
-                      v-model="item.value"
-                    ></l-select-datetime-duration>
-                  </template>
-                  <template v-else>
-                    <v-text-field
-                      :hint="item.hint"
-                      :label="item.label"
-                      :prepend-icon="item.icon"
-                      :readonly="item.readonly"
-                      :rules="item.rules"
-                      v-model="item.value"
-                    ></v-text-field>
-                  </template>
+                <v-flex
+                  :class="item.layout"
+                  :key="'flex' + i"
+                  :ref="'filter' + i"
+                  v-for="(item, i) in filterItems"
+                >
+                  <l-input
+                    :config="item"
+                    v-model="item.value"
+                  ></l-input>
                 </v-flex>
               </v-layout>
               <v-layout row wrap>
                 <v-flex>
-                  <v-btn @click="getData_(initPage)" class="mx-0" color="primary" small>
+                  <v-btn @click="getData_(initPage)" class="mx-0" color="primary" flat small>
                     筛选
                   </v-btn>
-                  <v-btn @click="resetFilter()" small>
+                  <v-btn @click="resetFilter()" color="grey" flat small>
                     重置
                   </v-btn>
                 </v-flex>
@@ -151,127 +78,122 @@
           </v-container>
         </slot>
       </div>
-      <div :key="'table'">
-        <v-divider v-if="filter"></v-divider>
-        <v-data-table
-          :disable-initial-sort="!mustSort && !initSortBy"
-          :headers="headers"
-          :hide-actions="hideActions || hideActions_"
-          :hide-headers="hideHeaders || hideHeaders_"
-          :item-key="itemKey"
-          :items="(error || errorData.error) ? [] : data_"
-          :loading="loading || loading_"
-          :must-sort="mustSort"
-          :no-results-text="noResultsText"
-          :pagination.sync="pagination"
-          :rows-per-page-items="rowsPerPageItems"
-          :search="innerSort?search:undefined"
-          :select-all="selectable"
-          :total-items="innerSort ? undefined : (error || errorData.error) ? 0 : computeTotal"
-          rows-per-page-text="每页行数"
-          v-model="selected_"
-        >
-          <template slot="no-data">
-            <slot :error="error ? errorMessage : errorData" :loading="loading_ || loading" name="no-data">
-              <v-flex class="body-2 text-xs-center">
-                <div v-if="loading_ || loading">{{loadingText}}</div>
-                <div v-else-if="error">
-                  <span>加载出错</span><span v-if="errorMessage">: {{errorMessage}}</span>
-                  <v-btn @click="getData_(initPage)" class="mx-2" color="primary" flat>重新加载</v-btn>
-                </div>
-                <div v-else-if="errorData.error">
-                  <span>加载出错: {{errorData.message}}, code: {{errorData.code}}</span>
-                  <v-btn @click="getData_(initPage)" class="mx-2" color="primary" flat>重新加载</v-btn>
-                </div>
-                <div class="grey--text" v-else>{{noDataText}}</div>
-              </v-flex>
-            </slot>
-          </template>
-          <template slot="items" slot-scope="p">
-            <tr :active="p.selected" :style="clickable ? 'cursor: pointer':''"
-                @click="clickRow(p.item, p.index, p.selected)">
-              <td style="width: 80px" v-if="selectable">
-                <div @click.stop style="width: 0">
-                  <v-checkbox
-                    hide-details
-                    primary
-                    v-model="p.selected"
-                  ></v-checkbox>
-                </div>
-              </td>
-              <td
-                :class="['text-xs-' + (header.align||'left')]"
-                :key="i"
-                v-for="(header, i) in headers"
-                v-if="header.value"
-              >
-                <div>
-                  <v-tooltip :disabled="!header.tooltip" bottom max-width="48em">
+    </v-expand-transition>
+    <div :key="'table'">
+      <v-divider v-if="filter"></v-divider>
+      <v-data-table
+        :disable-initial-sort="!mustSort && !initSortBy"
+        :headers="headers"
+        :hide-actions="hideActions || hideActions_"
+        :hide-headers="hideHeaders || hideHeaders_"
+        :item-key="itemKey"
+        :items="(error || errorData.error) ? [] : data_"
+        :loading="loading || loading_"
+        :must-sort="mustSort"
+        :no-results-text="noResultsText"
+        :pagination.sync="pagination"
+        :rows-per-page-items="rowsPerPageItems"
+        :search="innerSort?search:undefined"
+        :select-all="selectable"
+        :total-items="innerSort ? undefined : (error || errorData.error) ? 0 : computeTotal"
+        rows-per-page-text="每页行数"
+        v-model="selected_"
+      >
+        <template slot="no-data">
+          <slot :error="error ? errorMessage : errorData" :loading="loading_ || loading" name="no-data">
+            <v-flex class="body-2 text-xs-center">
+              <div v-if="loading_ || loading">{{loadingText}}</div>
+              <div v-else-if="error">
+                <span>加载出错</span><span v-if="errorMessage">: {{errorMessage}}</span>
+                <v-btn @click="getData_(initPage)" class="mx-2" color="primary" flat>重新加载</v-btn>
+              </div>
+              <div v-else-if="errorData.error">
+                <span>加载出错: {{errorData.message}}, code: {{errorData.code || 0}}</span>
+                <v-btn @click="getData_(initPage)" class="mx-2" color="primary" flat>重新加载</v-btn>
+              </div>
+              <div class="grey--text" v-else>{{noDataText}}</div>
+            </v-flex>
+          </slot>
+        </template>
+        <template slot="items" slot-scope="p">
+          <tr :active="p.selected" :style="clickable ? 'cursor: pointer':''"
+              @click="clickRow(p.item, p.index, p.selected)">
+            <td style="width: 80px" v-if="selectable">
+              <div @click.stop style="width: 0">
+                <v-checkbox
+                  hide-details
+                  primary
+                  v-model="p.selected"
+                ></v-checkbox>
+              </div>
+            </td>
+            <td
+              :class="['text-xs-' + (header.align||'left')]"
+              :key="i"
+              v-for="(header, i) in headers"
+              v-if="header.value"
+            >
+              <div>
+                <v-tooltip :disabled="!header.tooltip" bottom max-width="48em">
+                  <div
+                    :class="header.maxWidth? 'hide-more-content':'' "
+                    :style="header.maxWidth?'max-width: ' + header.maxWidth:''"
+                    class="d-inline-block"
+                    slot="activator"
+                  >
                     <div
-                      :class="header.maxWidth? 'hide-more-content':'' "
-                      :style="header.maxWidth?'max-width: ' + header.maxWidth:''"
-                      class="d-inline-block"
-                      slot="activator"
-                    >
-                      <div
-                        :class="header.monospaced? 'monospaced':''"
-                        :style="header.monospaced? {'width': header.monospaced + '!important'}:''"
-                        v-if="tdItemValue(p.item[header.value], header) || !header.placeholder"
-                      >{{tdItemValue(p.item[header.value], header)}}
-                      </div>
-                      <span class="grey--text" v-else>{{header.placeholder}}</span>
+                      :class="header.monospaced? 'monospaced':''"
+                      :style="header.monospaced? {'width': header.monospaced + '!important'}:''"
+                      v-if="tdItemValue(p.item[header.value], header) || !header.placeholder"
+                    >{{tdItemValue(p.item[header.value], header)}}
                     </div>
-                    <span>{{tdItemValue(p.item[header.value], header)}}</span>
-                  </v-tooltip>
-                  <span class="grey--text caption pl-4"
-                        v-if="header.remark && header.remark.filter(p.item[header.value])">{{header.remark.text}}</span>
-                </div>
-                <!--<div v-else>-->
-                <!--<div-->
-                <!--:style="header.maxWidth?'max-width: ' + header.maxWidth:''"-->
-                <!--:class="header.maxWidth? 'hide-more-content':'' "-->
-                <!--&gt;-->
-                <!--<span v-if="tdItemValue(p.item[header.value], header) || !header.placeholder">{{tdItemValue(p.item[header.value], header)}}</span>-->
-                <!--<span v-else class="grey&#45;&#45;text">{{header.placeholder}}</span>-->
-                <!--</div>-->
-                <!--</div>-->
-              </td>
+                    <span class="grey--text" v-else>{{header.placeholder}}</span>
+                  </div>
+                  <span>{{tdItemValue(p.item[header.value], header)}}</span>
+                </v-tooltip>
+                <span class="grey--text caption pl-4"
+                      v-if="header.remark && header.remark.filter(p.item[header.value])">{{header.remark.text}}</span>
+              </div>
+              <!--<div v-else>-->
+              <!--<div-->
+              <!--:style="header.maxWidth?'max-width: ' + header.maxWidth:''"-->
+              <!--:class="header.maxWidth? 'hide-more-content':'' "-->
+              <!--&gt;-->
+              <!--<span v-if="tdItemValue(p.item[header.value], header) || !header.placeholder">{{tdItemValue(p.item[header.value], header)}}</span>-->
+              <!--<span v-else class="grey&#45;&#45;text">{{header.placeholder}}</span>-->
+              <!--</div>-->
+              <!--</div>-->
+            </td>
 
-              <!--行操作插槽-->
-              <slot :index="p.index" :item="p.item" :selected="p.selected" name="row-action"></slot>
-            </tr>
-          </template>
-          <template slot="pageText" slot-scope="props">
-            <v-layout align-center row>
-              <span>第</span>
-              <v-text-field
-                @input="jumpPage"
-                class="d-inline-block mx-2 caption pt-0 mt-0"
-                hide-details
-                single-line
-                style="width: 44px"
-                v-model="tablePage"
-              ></v-text-field>
-              <span>页</span>
-              <span>， {{props.pageStart}} - {{props.pageStop}} 条，共 {{props.itemsLength}} 条，
+            <!--行操作插槽-->
+            <slot :index="p.index" :item="p.item" :selected="p.selected" name="row-action"></slot>
+          </tr>
+        </template>
+        <template slot="pageText" slot-scope="props">
+          <v-layout align-center row>
+            <span>第</span>
+            <v-text-field
+              @input="jumpPage"
+              class="d-inline-block mx-2 caption pt-0 mt-0"
+              hide-details
+              single-line
+              style="width: 44px"
+              v-model="tablePage"
+            ></v-text-field>
+            <span>页</span>
+            <span>， {{props.pageStart}} - {{props.pageStop}} 条，共 {{props.itemsLength}} 条，
                 {{Math.ceil(props.itemsLength/pagination.rowsPerPage)}} 页</span>
-            </v-layout>
-          </template>
-        </v-data-table>
-      </div>
-    </l-expand-transition-group>
+          </v-layout>
+        </template>
+      </v-data-table>
+    </div>
   </v-card>
 </template>
 
 <script>
-import LExpandTransitionGroup from '../Transition/LExpandTransitionGroup'
 import debounce from 'lodash/debounce'
-import LSelectTime from '../Inputs/Time/LSelectTime'
-import LSelectDatetime from '../Inputs/Time/LSelectDatetime'
-import LSelectWeekday from '../Inputs/Time/LSelectWeekday'
-import LSelectDatetimeDuration from '../Inputs/Time/LSelectDatetimeDuration'
 // import {logger} from '../utils/logger'
-import LSelectDate from '../Inputs/Time/LSelectDate'
+import LInput from '../Inputs/LInput'
 
 let logger = {
   debug: console.log,
@@ -282,14 +204,7 @@ let logger = {
 }
 export default {
   name: 'LDataTable',
-  components: {
-    LSelectDate,
-    LSelectDatetimeDuration,
-    LSelectWeekday,
-    LSelectDatetime,
-    LSelectTime,
-    LExpandTransitionGroup
-  },
+  components: {LInput},
   props: {
     color: {
       type: String,
@@ -511,8 +426,8 @@ export default {
     switchValue () {
       this.getData_(this.initPage)
     },
-    search: debounce(function (val) {
-      if (typeof val === 'string' && val.trim()) {
+    search: debounce(function (val, oldVal) {
+      if ((typeof val === 'string' && val.trim()) || (oldVal && !val)) {
         if (this.pagination.page !== 1) {
           this.pagination.page = 1
         }
@@ -577,7 +492,9 @@ export default {
     },
     resetFilter () {
       this.$refs.filterForm.reset()
-      this.getData_(this.initPage)
+      this.$nextTick(() => {
+        this.getData_(this.initPage)
+      })
     },
     async refreshData_ () {
       this.refreshLoading = true

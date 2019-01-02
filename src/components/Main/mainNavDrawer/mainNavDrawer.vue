@@ -10,23 +10,11 @@
     v-model="drawerModel"
   >
     <!--系统logo区域-->
-    <v-layout align-center style="height: 96px">
-      <v-flex align-center justify-center layout v-if="!smallScreen && !mainNavDrawer">
-        <v-avatar>
-          <img alt="logo" src="@/assets/lazylz_avatar.jpg"/>
-        </v-avatar>
-      </v-flex>
-      <v-flex class="pl-3 pt-4" v-else layout column>
-        <div class="title white--text">{{$L.cfg.appName.full}}</div>
-        <!--<span class="px-2 font-weight-light white&#45;&#45;text">|</span>-->
-        <div class="font-weight-light pt-1 subheading primary--text ">{{$L.cfg.appName.subTitle}}</div>
-      </v-flex>
-    </v-layout>
-
+    <slot :mini="!smallScreen && !mainNavDrawer" name="logo"></slot>
     <v-divider></v-divider>
 
     <!--导航区域-->
-    <v-list dense class="pt-0">
+    <v-list :dense="$L.cfg.denseNavDrawer || (!smallScreen && !mainNavDrawer)" class="pt-0">
       <template v-for="(item, i) in navDrawerItem">
         <!--副标题-->
         <v-layout
@@ -71,8 +59,10 @@
         <v-list-group
           :key="i"
           :prepend-icon="item.icon"
+          append-icon=""
           no-action
           v-else-if="!miniNavDrawer"
+          v-model="item.activate"
         >
           <!--一级标题 不跳转-->
           <v-list-tile slot="activator">
@@ -81,10 +71,13 @@
                 {{ item.label }}
               </v-list-tile-title>
             </v-list-tile-content>
+            <v-list-tile-action>
+              <v-icon :class="item.activate? 'reverse':''" color="grey lighten-1">mdi-chevron-down</v-icon>
+            </v-list-tile-action>
           </v-list-tile>
           <template v-for="(subItem, j) in item.children">
             <!--二级标题 无子标题-->
-            <v-list-tile :key="j" v-if="noChildren(subItem)" @click="go(subItem.to)">
+            <v-list-tile :key="j" @click="go(subItem.to)" v-if="noChildren(subItem)">
               <v-list-tile-content>
                 <v-list-tile-title class="grey--text text--lighten-1">
                   {{ subItem.label }}
@@ -104,7 +97,7 @@
               </v-list-tile>
 
               <!--三级标题-->
-              <v-list-tile :key="k" v-for="(ssItem, k) in subItem.children" @click="go(ssItem.to)">
+              <v-list-tile :key="k" @click="go(ssItem.to)" v-for="(ssItem, k) in subItem.children">
                 <v-list-tile-content>
                   <v-list-tile-title class="grey--text text--lighten-1">
                     {{ ssItem.label }}
@@ -150,9 +143,29 @@ export default {
   name: 'mainNavDrawer',
   components: {DrawerMenu},
   data: () => ({
-    navDrawerItem: navDrawerItems
+    navDrawerItems_: navDrawerItems
   }),
   computed: {
+    isDevelopment () {
+      return this.$store.getters.isDevelopment
+    },
+    permission () {
+      return this.$store.state.login.permission
+    },
+    navDrawerItem: {
+      get () {
+        let navs = this.navDrawerItems_
+        let permission = this.permission
+        // console.log('getP', this.permission)
+        let views = this.buildNavDrawer(navs, permission)
+        // console.log('navdrawer', views)
+        return views
+      },
+      set (val) {
+        // 必须设置set使v-list-group能修改activate值
+        // console.log('set', val)
+      }
+    },
     noChildren () {
       return (item) => {
         return !item.children || item.children.length === 0
@@ -203,6 +216,35 @@ export default {
     }
   },
   methods: {
+    buildNavDrawer (navs, permission = {}) {
+      // console.log('np', navs, permission)
+      let views = []
+      for (let i = 0; i < navs.length; ++i) {
+        let nav = navs[i]
+        let view = Object.assign(nav)
+        if (nav.hidden) continue
+        if (nav.divider || nav.heading) {
+          views.push(nav)
+          continue
+        }
+        if (!nav.children) nav.children = []
+        if (!nav.access) {
+          if ((this.isDevelopment && nav.development) || !nav.development) {
+            view.children = this.buildNavDrawer(nav.children, {})
+            views.push(view)
+          }
+        }
+        else if (this.havPermission(permission, nav.access)) {
+          view.children = this.buildNavDrawer(nav.children, permission[nav.access])
+          views.push(nav)
+        }
+      }
+      return views
+    },
+    havPermission (permission, access) {
+      // console.log(permission, access)
+      return this.$L.F.haveTruthyAttr(permission, access, false, true, ':')
+    },
     click (e, delay = 0) {
       if (delay) {
         setTimeout(() => {
@@ -231,5 +273,8 @@ export default {
 </script>
 
 <style scoped>
-
+  .reverse {
+    transition: 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform: rotate(180deg);
+  }
 </style>

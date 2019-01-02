@@ -10,9 +10,9 @@
       v-model="value_"
     ></l-error-dialog>
     <v-snackbar
+      :color="isError? 'error': ''"
       :timeout="3000"
       bottom
-      :color="isError? 'error': ''"
       v-if="isSnackbar"
       v-model="value_"
     >
@@ -81,16 +81,24 @@ export default {
         }
       },
       set (val) {
-        console.log('set', val, this.isError, this.isSuccess, this.isDialog, this.isSnackbar)
+        console.log(`set value_: ${this.value}, activate: ${this.activate}`)
+        // console.log('set', val, this.isError, this.isSuccess, this.isDialog, this.isSnackbar)
         if (this.value === undefined) {
           this.activate = val
         }
-        else {
+        else if (val !== this.value) {
           this.$emit('input', val)
         }
       }
+    },
+  },
+  watch: {
+    value (val) {
+      console.log('set value', val)
+      if (val !== undefined) {
+        this.value_ = val
+      }
     }
-
   }
 }
 </script>

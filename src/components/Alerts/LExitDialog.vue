@@ -4,11 +4,10 @@
     confirm-text="立即退出"
     disable-cancel
     :auto-close="false"
-    max-width="350px"
+    width="400px"
     title="登录信息失效"
     v-model="exitDialogActivate"
   >
-    <slot name="activator" slot="activator"></slot>
     <v-layout class="mx-2" column>
       <v-flex align-center column justify-center layout>
         <v-icon class="pb-3" large>mdi-timer-sand-empty</v-icon>
@@ -43,6 +42,7 @@ export default {
   },
   watch: {
     exitDialogActivate (val) {
+      console.log('open', val)
       if (val) {
         countId = setInterval(() => {
           if (this.count === 0) {
@@ -81,8 +81,8 @@ export default {
     // },
   },
   methods: {
-    timeoutLogout () {
-      this.$store.dispatch('login/logout', true)
+    async timeoutLogout () {
+      await this.$store.dispatch('login/logout', true)
       clearInterval(countId)
       this.exitDialogActivate = false
       this.$router.push('/')

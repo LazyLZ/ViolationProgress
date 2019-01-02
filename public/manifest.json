@@ -1,15 +1,10 @@
 {
-  "name": "ladmin",
-  "short_name": "ladmin",
+  "name": "电子科技大学平安成电智慧通行管理系统",
+  "short_name": "平安成电智慧通行",
   "icons": [
     {
-      "src": "./img/icons/android-chrome-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "./img/icons/android-chrome-512x512.png",
-      "sizes": "512x512",
+      "src": "./favicon.ico",
+      "sizes": "128x128",
       "type": "image/png"
     }
   ],

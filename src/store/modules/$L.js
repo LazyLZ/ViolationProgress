@@ -3,14 +3,17 @@ import F from '../../utils/functional'
 import routes from '@/router/routes'
 
 let routeToTab = function (route) {
-  return {
+  if (route.meta.singlePage) return
+  let tab = {
     key: route.name,
     label: route.meta.label || route.name || route.path,
     to: route.fullPath || route.path || '',
     persistent: route.meta.persistent || false,
     subText: F.getAttr(route, route.meta.subText),
+    cacheKey: F.getAttr(route, route.meta.cacheKey),
     beforeCloseName: route.meta.beforeCloseName || ''
   }
+  return tab
 }
 let getPersistentTab = function () {
   let tabs = []
@@ -30,11 +33,22 @@ let getPersistentTab = function () {
 }
 const state = {
   dark: false,
+  platform: {
+    isApple: false, // ios || macOS
+    isWindows: false,
+    isIOS: false, // iPhone || ipad
+    isIPad: false,
+    isIPhone: false,
+    isMacOS: false,
+    isLinux: false,
+    isAndroid: false,
+  },
   mainNavDrawer: true,
   mainTabItems: [],
+  lastCloseTab: null,
   floatingTabs: false,
   pageLoading: false,
-  haveNotification: true,
+  haveNotification: false,
   globalAlert: {
     type: '',
     title: '',
@@ -69,17 +83,33 @@ const getters = {
 const actions = {}
 const mutations = {
   updateField,
+  setPageLoading (state, val) {
+    state.pageLoading = !!val
+  },
   addTab (state, route) {
     let tab = routeToTab(route)
-    state.mainTabItems.push(tab)
-    F.saveToLocal('$mainTabItems', state.mainTabItems)
+    if (tab) {
+      state.mainTabItems.push(tab)
+      F.saveToLocal('$mainTabItems', state.mainTabItems)
+    }
   },
   closeTab (state, i) {
+    state.lastCloseTab = state.mainTabItems[i]
     state.mainTabItems.splice(i, 1)
     F.saveToLocal('$mainTabItems', state.mainTabItems)
   },
   changeTab (state, tabs) {
+    if (state.mainTabItems.length < tabs.length) {
+      for (let i = 0; i < state.mainTabItems.length; ++i) {
+        let tab = state.mainTabItems[i]
+        if (!tabs.find(t => t.to === tab.to)) {
+          state.lastCloseTab = tab
+          break
+        }
+      }
+    }
     state.mainTabItems = tabs
+    F.saveToLocal('$mainTabItems', state.mainTabItems)
   },
   moveTab (state, {from, to}) {
     let insertIndex = from > to ? to + 1 : to
@@ -129,6 +159,15 @@ const mutations = {
       message: message
     }
     state.globalAlertActivate = true
+  },
+  closeAlert (state) {
+    state.globalAlert = {
+      type: '',
+      title: '',
+      message: ''
+    }
+    state.globalAlertActivate = false
+    console.log('close alert')
   },
   openOperation (state, attr) {
     let emptyF = () => {

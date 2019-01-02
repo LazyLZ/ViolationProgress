@@ -79,7 +79,7 @@ export default {
     },
     width: {
       type: String,
-      default: '350px'
+      default: ''
     },
     autoClose: {
       type: Boolean,

@@ -10,7 +10,7 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-tooltip bottom class="hidden-sm-and-down">
-      <v-btn icon slot="activator">
+      <v-btn @click="fullScreen = !fullScreen" icon slot="activator">
         <v-icon>mdi-fullscreen</v-icon>
       </v-btn>
       <span>全屏</span>
@@ -24,7 +24,7 @@
     </v-tooltip>
     <!--</color-menu>-->
     <v-tooltip bottom>
-      <v-btn @click="haveNotification = !haveNotification" icon slot="activator">
+      <v-btn icon slot="activator">
         <v-badge
           overlap=""
           size="4px"
@@ -36,20 +36,25 @@
       </v-btn>
       <span>系统消息</span>
     </v-tooltip>
-    <user-menu>
-      <v-btn icon slot="activator">
-        <v-avatar size="36px">
-          <img alt="lazylz" src="@/assets/lazylz_avatar.jpg"/>
-        </v-avatar>
-      </v-btn>
-    </user-menu>
+
+    <v-toolbar-items style="width: 64px">
+      <user-menu>
+        <v-btn flat slot="activator">
+          <span class="subheading primary--text">{{loginName || '未命名'}}</span>
+          <!--<div class="primary&#45;&#45;text l-avatar">L</div>-->
+          <!--<v-avatar size="36px">-->
+          <!--<img alt="lazylz" src="@/assets/lazylz_avatar.jpg"/>-->
+          <!--</v-avatar>-->
+        </v-btn>
+      </user-menu>
+    </v-toolbar-items>
+
   </v-toolbar>
 </template>
 
 <script>
 import {createHelpers} from 'vuex-map-fields'
 import MainBreadcrumbs from './mainBreadcrumbs'
-import ColorMenu from './colorMenu'
 import UserMenu from './userMenu'
 
 const {mapFields} = createHelpers({
@@ -58,8 +63,28 @@ const {mapFields} = createHelpers({
 })
 export default {
   name: 'mainToolbar',
-  components: {UserMenu, ColorMenu, MainBreadcrumbs},
+  components: {UserMenu, MainBreadcrumbs},
+  data: () => ({
+    full_: false
+  }),
   computed: {
+    fullScreen: {
+      get () {
+        return this.full_
+      },
+      set (val) {
+        if (val) {
+          this.inFullScreen()
+        }
+        else {
+          this.exitFullscreen()
+        }
+        this.full_ = val
+      }
+    },
+    loginName () {
+      return this.$store.state.login.name
+    },
     ...mapFields([
       'dark',
       'mainNavDrawer',
@@ -67,10 +92,39 @@ export default {
       'bcItems'
     ])
   },
-  data: () => ({})
+  methods: {
+    inFullScreen () {
+      let el = document.documentElement
+      let rfs = el.requestFullScreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen
+      if (rfs instanceof Function) {
+        rfs.call(el)
+      }
+    },
+    exitFullscreen () {
+      if (document.exitFullscreen) {
+        document.exitFullscreen()
+      }
+      else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen()
+      }
+      else if (document.webkitCancelFullScreen) {
+        document.webkitCancelFullScreen()
+      }
+      else if (document.msExitFullscreen) {
+        document.msExitFullscreen()
+      }
+    },
+  },
 }
 </script>
 
 <style scoped>
-
+  .l-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 36px;
+    line-height: 36px;
+    border: 1px solid;
+    font-size: 24px;
+  }
 </style>

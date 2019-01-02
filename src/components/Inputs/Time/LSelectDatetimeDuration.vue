@@ -13,7 +13,6 @@
       :clearable="!readonly"
       readonly
       :disabled="disabled"
-      clear-icon="clear"
       :rules="[...rules, durationError]"
       v-model="durationFormatted"
       :label="label"
@@ -21,7 +20,7 @@
       hint="年/月/日/时/分 - 年/月/日/时/分"
       persistent-hint
       @keyup.enter="menu = false"
-      :prepend-icon="hideIcon ? '':'date_range'"
+      :prepend-icon="hideIcon ? '':'$vuetify.icons.datetimeDuration'"
     ></v-text-field>
     <v-card>
       <v-container grid-list-md>
@@ -53,7 +52,7 @@
 
 <script>
 import LSelectDatetime from './LSelectDatetime'
-
+import {time} from '../../../utils/time'
 // let datePattern = /^\d{4}\.\d\d\.\d\d$/i
 // let timePattern = /^\d\d:\d\d$/i
 // let datetimePattern = /^(\d{4}.\d\d.\d\d) (\d\d:\d\d)$/i
@@ -104,7 +103,7 @@ export default {
   },
   data: () => ({
     menu: false,
-    durationFormated: null,
+    // durationFormatted: null,
     startDatetime: null,
     endDatetime: null,
     durationRule: v => !v || durationRule.test(v) || '时间段格式不正确：年/月/日/时/分 - 年/月/日/时/分',
@@ -119,8 +118,9 @@ export default {
       if (year && month && day) {
         let d = new Date(year, month - 1, day)
         d.setDate(d.getDate() + this.maxDurationDay)
-        return this.util.formatDatetimefromDate(d, 'date')
+        return time.stringify(d, time.D)
       }
+      return undefined
     },
     durationError () {
       return !this.startDatetime || !this.endDatetime || this.startDatetime <= this.endDatetime || '起始时间不能大于结束时间'
@@ -131,6 +131,7 @@ export default {
         let date = group[0]
         return date
       }
+      return undefined
     },
     durationFormatted: {
       get () {
@@ -172,7 +173,7 @@ export default {
       deep: true
     },
     durationFormatted (val) {
-      console.log('test', this.maxDurationDay, this.maxDurationDate, this.startDatetime, this.startDate)
+      // console.log('test', this.maxDurationDay, this.maxDurationDate, this.startDatetime, this.startDate)
       this.submit()
     },
     value (val) {
@@ -196,7 +197,7 @@ export default {
       // this.duration.startDatetime = this.startDatetime
       // this.duration.endDatetime = this.endDatetime
       this.$emit('input', this.duration)
-      // console.log('submit', this.duration)
+      console.log('submit', this.duration)
     }
   },
   created () {

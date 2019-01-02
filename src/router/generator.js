@@ -69,13 +69,25 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   // console.log(store.getters['login/isLogin'])
   if (isNeedLogin(to)) {
-    next({name: LOGIN_PAGE_NAME})
+    next({
+      name: LOGIN_PAGE_NAME,
+      params: {
+        from: from,
+        to: to
+      }
+    })
   }
   else if (havePermission(to)) {
     next()
   }
   else {
-    next({name: ACCESS_DENY_PAGE_NAME})
+    next({
+      name: ACCESS_DENY_PAGE_NAME,
+      params: {
+        from: from,
+        to: to
+      }
+    })
   }
 })
 

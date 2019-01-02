@@ -3,8 +3,8 @@
     bottom
     :close-on-content-click="false"
     close-delay="100"
-    min-width="350px"
-    max-width="350px"
+    min-width="300px"
+    max-width="300px"
     nudge-bottom="8px"
     offset-y
     open-delay="200"
@@ -16,10 +16,12 @@
     <v-card flat>
       <v-list>
         <v-list-tile avatar>
+          <!--<v-list-tile-avatar>-->
+            <!--<img alt="LazyLZ" src="@/assets/lazylz_avatar.jpg">-->
+          <!--</v-list-tile-avatar>-->
           <v-list-tile-avatar>
-            <img alt="LazyLZ" src="@/assets/lazylz_avatar.jpg">
+            <v-icon size="36">mdi-account-circle</v-icon>
           </v-list-tile-avatar>
-
           <v-list-tile-content>
             <v-list-tile-title :class="loginName || 'grey--text'">{{loginName || '未命名'}}</v-list-tile-title>
             <v-list-tile-sub-title class="caption">{{loginId}}</v-list-tile-sub-title>
@@ -135,7 +137,7 @@ export default {
         this.$router.push({name: LOGIN_PAGE_NAME})
       }
       catch (e) {
-        this.$store.commit('alert', {type: 'error', title: '登出时发生错误', message: e.message})
+        this.$store.dispatch('alert', {type: 'error', title: '登出时发生错误', message: e.message})
       }
       finally {
         this.logoutLoading = false

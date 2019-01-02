@@ -2,18 +2,21 @@
   <v-container fluid>
     <v-layout justify-center row>
       <v-flex lg10 md12>
+        <h1>////</h1>
+        <v-btn @click="test()">test Time Parse</v-btn>
         <l-data-table
-          :get-data-func="getData"
-          :headers="vheaders"
-          title-text="测试列表"
+        :get-data-func="getData"
+        :headers="vheaders"
+        title-text="测试列表"
         ></l-data-table>
       </v-flex>
     </v-layout>
-    <v-btn @click="post">test post</v-btn>
+    <!--<v-btn @click="post">test post</v-btn>-->
   </v-container>
 </template>
 <script>
 import LDataTable from '../../components/Data/LDataTable'
+import {time} from '../../utils/time'
 
 export default {
   name: 'TestComponents',
@@ -38,20 +41,25 @@ export default {
     ]
   }),
   methods: {
+    test () {
+      let s = '2018-08-08 18:08'
+      time.parse(s)
+    },
     async post () {
-      this.$axios.post('/passApi/pass/log/list', {}, {
-      })
+      this.$axios.post('/passApi/pass/log/list', {}, {})
     },
     async getData ({pagination, sortStack, filterItems, titleSwitch, search}) {
       let url = '/api/peccancy/getAll'
       try {
-        return this.$store.dispatch('getDataList', {pagination, url})
+        let res = await this.$store.dispatch('getDataList', {pagination, url})
+        return res
       }
       catch (e) {
-        this.$store.dispatch('alert', {type: 'error', title: '获取列表时发生错误', message: e.message})
+        // this.$store.dispatch('alert', {type: 'error', title: '获取列表时发生错误', message: e.message})
+        throw e
       }
     }
-  }
+  },
 }
 </script>
 

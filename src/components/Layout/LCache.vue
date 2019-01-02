@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!--<div>{{cache}}</div>-->
     <slot :data="data_" :id="id" v-if="!isError && !isLoading"></slot>
     <slot name="loading" v-if="isLoading && !isError"></slot>
     <slot :code="errorCode" :message="errorMessage" name="error" v-if="isError"></slot>
@@ -7,7 +8,6 @@
 </template>
 
 <script>
-// TODO 标签关闭时要删除缓存
 export default {
   name: 'LCache',
   props: {
@@ -26,6 +26,9 @@ export default {
     error_: false,
   }),
   computed: {
+    lastCloseTab () {
+      return this.$store.state.$L.lastCloseTab
+    },
     hasLoadingPage () {
       return !!this.$slots.loading || !!this.$scopedSlots.loading
     },
@@ -40,6 +43,14 @@ export default {
     }
   },
   watch: {
+    lastCloseTab (val) {
+      console.log('closeTab', val)
+      if (val instanceof Object && val.cacheKey) {
+        if (this.cache.hasOwnProperty(val.cacheKey)) {
+          this.clear(val.cacheKey)
+        }
+      }
+    },
     id (val) {
       if (val) {
         console.log('get data', val)
@@ -51,6 +62,18 @@ export default {
     }
   },
   methods: {
+    clear (key) {
+      if (this.cache.hasOwnProperty(key)) {
+        delete this.cache[key]
+      }
+      if (key === this.id) {
+        this.refreshData(this.id)
+      }
+    },
+    clearAll () {
+      this.cache = {}
+      this.refreshData(this.id)
+    },
     async refreshData (key) {
       try {
         this.loading_ = true
@@ -98,6 +121,7 @@ export default {
     }
   },
   created () {
+    console.log('create')
     if (this.id) {
       this.refreshData(this.id)
     }
