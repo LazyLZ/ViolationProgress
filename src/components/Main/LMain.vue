@@ -37,19 +37,6 @@
         </transition>
       </l-fixed-window>
     </v-content>
-    <v-footer
-      app
-      class="footer"
-      fixed
-      height="36px"
-      inset
-      v-if="$route.meta.showFooter"
-    >
-      <v-layout class="caption grey--text text-xs-center" justify-cetner>
-        <v-flex>&copy;{{(new Date()).getFullYear()}} Design by LZ</v-flex>
-        <div class="px-2">Ver. 0.1.0</div>
-      </v-layout>
-    </v-footer>
   </div>
 </template>
 

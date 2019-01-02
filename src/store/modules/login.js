@@ -121,52 +121,65 @@ const mutations = {
 
 const actions = {
   async login ({dispatch, commit}, {loginId, password, verifyKey, type}) {
-    let message = {
-      url: type === 'portal' ? '/shiroApi/auth/thirdpart/login?pipe=uestc-portal' : '/shiroApi/auth',
-      method: 'post',
-      data: {
-        'username': loginId,
-        'password': password,
-        'verifyKey': verifyKey
-      },
-      timeout: 5000,
-    }
-    let {Authorization, name, username} = await dispatch('getDataFromApi', message, {root: true})
-    if (!Authorization) {
-      throw new LError('该用户未授权', -1)
-    }
+    // let message = {
+    //   url: type === 'portal' ? '/shiroApi/auth/thirdpart/login?pipe=uestc-portal' : '/shiroApi/auth',
+    //   method: 'post',
+    //   data: {
+    //     'username': loginId,
+    //     'password': password,
+    //     'verifyKey': verifyKey
+    //   },
+    //   timeout: 5000,
+    // }
+    // let {Authorization, name, username} = await dispatch('getDataFromApi', message, {root: true})
+    // if (!Authorization) {
+    //   throw new LError('该用户未授权', -1)
+    // }
+    // let loginInfo = new LoginInfo({
+    //   token: Authorization,
+    //   name: name,
+    //   id: username,
+    //   role: ''
+    // })
+    // commit('saveInfo', loginInfo)
+    // console.log('login', loginInfo.name)
     let loginInfo = new LoginInfo({
-      token: Authorization,
-      name: name,
-      id: username,
-      role: ''
+      token: '__TEST__',
+      name: 'TEST',
+      id: '__TEST_ACCOUNT__',
+      role: 'admin'
     })
     commit('saveInfo', loginInfo)
-    console.log('login', loginInfo.name)
     return loginInfo
     // your login dispatch
     // throw error when login failed
   },
   // 获取全局系统信息
-  async initSystemInfo ({dispatch, commit}, force = false) {
-    try {
-      let data = await Promise.all([
-        dispatch('getPermission'),
-        dispatch('getRole'),
-        dispatch('getSelfInfo'),
-        dispatch('initControllers')
-      ])
-      commit('setInit', true)
-      console.log('system init', data)
-    }
-    catch (e) {
-      if (force) {
+  initSystemInfo ({dispatch, commit}, force = false) {
+    // try {
+    //   let data = await Promise.all([
+    //     dispatch('getPermission'),
+    //     dispatch('getRole'),
+    //     dispatch('getSelfInfo'),
+    //     dispatch('initControllers')
+    //   ])
+    //   commit('setInit', true)
+    //   console.log('system init', data)
+    // }
+    // catch (e) {
+    //   if (force) {
+    //     commit('setInit', true)
+    //   }
+    //   else {
+    //     throw e
+    //   }
+    // }
+    return new Promise(resolve => {
+      setTimeout(() => {
         commit('setInit', true)
-      }
-      else {
-        throw e
-      }
-    }
+        resolve()
+      }, 1000)
+    })
   },
   async initControllers ({dispatch}) {
     return dispatch('parkingLot/initControllers', null, {root: true})
@@ -237,23 +250,26 @@ const actions = {
     return role
   },
   async logout ({dispatch, commit}, silent = false) {
-    try {
-      if (!silent) {
-        await dispatch('getDataFromApi', {
-          method: 'get',
-          url: '/shiroApi/logout'
-        }, {root: true})
-        // your logout dispatch
-      }
-    }
-    catch (e) {
-      // throw e
-    }
-    finally {
-      commit('deleteInfo')
-      commit('clearInit')
-      commit('$L/changeTab', [], {root: true})
-    }
+    // try {
+    //   if (!silent) {
+    //     await dispatch('getDataFromApi', {
+    //       method: 'get',
+    //       url: '/shiroApi/logout'
+    //     }, {root: true})
+    //     // your logout dispatch
+    //   }
+    // }
+    // catch (e) {
+    //   // throw e
+    // }
+    // finally {
+    //   commit('deleteInfo')
+    //   commit('clearInit')
+    //   commit('$L/changeTab', [], {root: true})
+    // }
+    commit('deleteInfo')
+    commit('clearInit')
+    commit('$L/changeTab', [], {root: true})
     return true
   },
   async logoutCount ({dispatch, commit}, {second, reason}) {

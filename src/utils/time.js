@@ -16,10 +16,10 @@ function preZero (s, n) {
 function to24 (l, p) {
   if (Number(l) === 12) {
     if (p === AM) {
-      return '12'
+      return '00'
     }
     else {
-      return '00'
+      return '12'
     }
   }
   if (p === AM) {
@@ -78,7 +78,7 @@ let transMap = {
   // '%j': d => d.getFullYear(), // 一年中的第几天(01-366)
   '%m': d => preZero(d.getMonth() + 1, 2), // 月份(01-12)
   '%M': d => preZero(d.getMinutes(), 2), // 分钟数(00-59)
-  '%p': d => d.getHours() > 12 || d.getHours() === 0 ? AM : PM, // 本地am或者pm的相应符
+  '%p': d => d.getHours() >= 12 ? PM : AM, // 本地am或者pm的相应符
   '%S': d => preZero(d.getSeconds(), 2), // 秒(01-61)
   // '%U': d => d.getW     一年中的星期数(00-53,星期天是一个星期的开始,第一个星期天之前的所有天数都放在第０周)
   '%w': d => d.getDay(), // 一个星期中的第几天(0-6,0是星期天)
