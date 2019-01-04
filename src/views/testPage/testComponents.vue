@@ -5,9 +5,9 @@
         <!--<h1>////</h1>-->
         <!--<v-btn @click="test()">test Time Parse</v-btn>-->
         <l-data-table
-        :get-data-func="getData"
-        :headers="vheaders"
-        title-text="测试列表"
+          :get-data-func="getData"
+          :headers="vheaders"
+          title-text="测试列表"
         ></l-data-table>
       </v-flex>
     </v-layout>

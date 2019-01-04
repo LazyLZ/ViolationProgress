@@ -275,6 +275,10 @@ export default [
   {
     path: '/violation',
     name: 'ViolationParent',
+    meta: {
+      label: '违章处理',
+      disabled: true
+    },
     component: Main,
     children: [
       {
