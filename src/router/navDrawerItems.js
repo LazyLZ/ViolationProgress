@@ -201,7 +201,7 @@ let navDrawerItems = [
       {
         // access: 'Event',
         label: '违章事件处理',
-        to: '/violation-event'
+        to: '/violation/event'
       },
       {
         // access: 'Rule',

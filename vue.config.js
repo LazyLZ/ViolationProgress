@@ -1,4 +1,4 @@
-let HOST = 'http://192.168.1.105:8080'
+let HOST = 'http://192.168.1.177:8080'
 // let HOST = 'https://mva.uestc.edu.cn'
 module.exports = {
   baseUrl: process.env.NODE_ENV === 'production' ? '/' : '/',

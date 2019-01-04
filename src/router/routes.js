@@ -34,6 +34,7 @@ export default [
           label: '首页',
           subText: '',
           icon: 'mdi-home',
+          disabled: true, // 面包屑不能点击
           persistent: true, // 持久tab，不可关闭，tab在最左侧
           // showFooter: true, // 显示系统footer
           recoverable: false, // 刷新浏览器时是否重新加载此tab
@@ -271,27 +272,42 @@ export default [
       },
     ]
   },
-  // {
-  //   path: '/user-admin2',
-  //   name: 'UserAdmin2',
-  //   component: Main,
-  //   meta: {
-  //     disabled: true,
-  //     label: '用户管理2'
-  //   },
-  //   children: [
-  //     {
-  //       name: 'UserNewParent',
-  //       path: 'user',
-  //       // redirect: {name: 'UserList'},
-  //       component: ParentView,
-  //       meta: {
-  //         label: '登记用户管理',
-  //         icon: 'mdi-plus'
-  //       },
-  //     }
-  //   ]
-  // },
+  {
+    path: '/violation',
+    name: 'ViolationParent',
+    component: Main,
+    children: [
+      {
+        path: 'event',
+        component: () => import(/* webpackChunkName: "violationEvent" */ '../views/ViolationEvent/violationEvent'),
+        name: 'ViolationEvent',
+        meta: {
+          label: '违章事件处理',
+        },
+      },
+      {
+        path: 'event',
+        name: 'ViolationEventParent',
+        redirect: {name: 'ViolationEvent'},
+        component: ParentView,
+        meta: {
+          label: '违章事件处理',
+        },
+        children: [
+          {
+            path: 'details-:carNumber',
+            name: 'ViolationDetails',
+            props: true,
+            meta: {
+              label: '违章详情',
+              subText: 'params.carNumber'
+            },
+            component: () => import(/* webpackChunkName: "violationEvent" */ '../views/ViolationEvent/violationEventDetails'),
+          }
+        ]
+      }
+    ]
+  },
   {
     path: '*',
     redirect: '/not-found'
