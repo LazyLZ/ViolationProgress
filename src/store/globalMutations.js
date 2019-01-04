@@ -1,3 +1,5 @@
+import F from '../utils/functional'
+
 let availablePlatform = {
   'Linux': true,
   'Mac68K': true,
@@ -66,6 +68,22 @@ export default {
       }
       s.isIOS = s.isIPad || s.isIPhone
       s.isApple = s.isIOS || s.isMacOS
+    }
+  },
+  closeTab (state, i) {
+    let $L = state.$L
+    let index
+    if (typeof i === 'number') {
+      index = i
+    }
+    if (typeof i === 'string') {
+      index = $L.mainTabItems.findIndex(tab => tab.to === i)
+    }
+    console.log('close tab ', i, index, $L.mainTabItems.map(tab => tab.to))
+    if (index >= 0) {
+      $L.lastCloseTab = $L.mainTabItems[index]
+      $L.mainTabItems.splice(index, 1)
+      F.saveToLocal('$mainTabItems', $L.mainTabItems)
     }
   }
 }

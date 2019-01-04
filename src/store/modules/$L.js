@@ -6,12 +6,20 @@ let routeToTab = function (route) {
   if (route.meta.singlePage) return
   let tab = {
     key: route.name,
+    name: route.name,
     label: route.meta.label || route.name || route.path,
     to: route.fullPath || route.path || '',
     persistent: route.meta.persistent || false,
     subText: F.getAttr(route, route.meta.subText),
     cacheKey: F.getAttr(route, route.meta.cacheKey),
-    beforeCloseName: route.meta.beforeCloseName || ''
+    beforeCloseName: route.meta.beforeCloseName || '',
+    notCache: route.meta.notCache,
+  }
+  if (route.matched && route.matched[1] && route.matched[1].components) {
+    let c = route.matched[1].components.default || {}
+    if (c.name === 'ParentView') {
+      tab.isChildren = true
+    }
   }
   return tab
 }
@@ -94,9 +102,18 @@ const mutations = {
     }
   },
   closeTab (state, i) {
-    state.lastCloseTab = state.mainTabItems[i]
-    state.mainTabItems.splice(i, 1)
-    F.saveToLocal('$mainTabItems', state.mainTabItems)
+    let index
+    if (typeof i === 'number') {
+      index = i
+    }
+    if (typeof i === 'string') {
+      index = state.mainTabItems.findIndex(tab => tab.to === i)
+    }
+    if (index >= 0) {
+      state.lastCloseTab = state.mainTabItems[index]
+      state.mainTabItems.splice(index, 1)
+      F.saveToLocal('$mainTabItems', state.mainTabItems)
+    }
   },
   changeTab (state, tabs) {
     if (state.mainTabItems.length < tabs.length) {

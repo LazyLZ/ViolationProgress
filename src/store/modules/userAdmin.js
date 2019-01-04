@@ -1,4 +1,5 @@
 import F from '@/utils/functional'
+import {Person} from '../../utils/SpavaObj'
 
 const state = {
 }
@@ -17,9 +18,10 @@ const actions = {
       sortStack,
       search,
       filter,
+      transDict: {phone: 'mobilePhone'},
       url: `/shiroApi/user/list`
     }, {root: true})
-    return {items: items, amount: amount}
+    return {items: items.map(t => Person.fromPlugin(t)), amount: amount}
   },
 }
 

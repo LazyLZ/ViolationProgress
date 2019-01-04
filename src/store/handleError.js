@@ -52,18 +52,18 @@ export function handleError (e) {
         code: e.code || 0
       }
     }
-    else if (e.hasOwnProperty('msg')) {
+    else if (e.hasOwnProperty('description')) {
       let p = /^([A-Z_])+(\d)+$/i
-      if (p.test(e.msg)) {
+      if (p.test(e.description)) {
         return {
-          code: e.msg || 0,
-          message: e.data || '未知错误'
+          code: e.statusCode || 0,
+          message: e.description || '未知错误'
         }
       }
       else {
         return {
-          message: e.msg || '未知错误',
-          code: e.status || 0,
+          message: e.description || '未知错误',
+          code: e.statusCode || 0,
         }
       }
     }

@@ -5,12 +5,16 @@
 class Param {
   constructor (f = {}, s = {}) {
     let key = f instanceof Object ? f.key || s.by : s.by
-    console.log('cp', f, s, key)
+    // console.log('cp', f, s, key)
     if (key) {
       let value = f.value === undefined ? '' : f.value
       let fn = f.f || s.f
       if (fn instanceof Function) {
         value = fn(value) || ''
+      }
+      if (typeof value !== 'string' && !(value instanceof Array)) {
+        console.warn('[SearchParam] value should be String or Array')
+        value = ''
       }
       this.key = key
       this.value = value
@@ -166,11 +170,11 @@ class SearchParam {
 
   create () {
     let result = {}
-    console.log('paramlist', this.paramList)
+    // console.log('paramlist', this.paramList)
     let idx = 0
     this.paramList.forEach(param => {
       let {key, value} = param.transform()
-      console.log('param', key, Object.assign({}, value))
+      // console.log('param', key, Object.assign({}, value))
       if (result[key]) {
         result[key] = SearchParam.merge(result[key], value)
       }
@@ -180,7 +184,7 @@ class SearchParam {
         result[key] = value
       }
     })
-    console.log('result', result)
+    // console.log('result', result)
     return result
   }
 }

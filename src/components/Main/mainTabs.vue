@@ -15,7 +15,7 @@
             :draggable="t.persistent ? 'false':'true'"
             :key="i"
             :style="tabWidthStyle(i)"
-            @click="$router.push(t.to)"
+            @click="$router.push({path: t.to})"
             @dragend.native="onDragEnd"
             @dragover.stop="onDragOver($event, i)"
             @dragstart.native="onDragStart($event, t, i)"

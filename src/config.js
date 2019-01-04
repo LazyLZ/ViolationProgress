@@ -22,6 +22,7 @@ export default {
     'file': 'mdi-file',
     'car': 'mdi-car',
     'refresh': 'mdi-refresh',
-    'filter': 'mdi-filter-variant'
+    'filter': 'mdi-filter-variant',
+    'add': 'mdi-plus'
   }
 }

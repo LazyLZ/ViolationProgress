@@ -13,15 +13,19 @@
         </v-flex>
       </v-layout>
     </template>
+    <template slot="footer">
+      <app-footer></app-footer>
+    </template>
   </l-main>
 </template>
 
 <script>
 import LMain from '../components/Main/LMain'
+import AppFooter from './APP/Footer/appFooter'
 
 export default {
   name: 'Main',
-  components: {LMain}
+  components: {AppFooter, LMain}
 }
 </script>
 

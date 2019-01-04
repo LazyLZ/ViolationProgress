@@ -30,13 +30,16 @@
           <v-progress-linear class="py-0 my-0" height="2" indeterminate v-if="pageLoading"></v-progress-linear>
           <main-tabs></main-tabs>
         </template>
+        <!--//{{cacheList}}//{{notCachePage}}//-->
         <transition mode="out-in">
-          <keep-alive :exclude="notCachePage">
+          <keep-alive :include="cacheList">
             <router-view/>
           </keep-alive>
         </transition>
       </l-fixed-window>
     </v-content>
+    <slot v-if="$route.meta.showFooter" name="footer">
+    </slot>
   </div>
 </template>
 
@@ -52,7 +55,7 @@ const {mapFields} = createHelpers({
   mutationType: '$L/updateField',
 })
 
-import route from '../../router/routes'
+// import route from '../../router/routes'
 
 export default {
   name: 'LMain',
@@ -85,6 +88,15 @@ export default {
       // 'globalOperationActivate',
       'pageloading'
     ]),
+    cacheList () {
+      let list = this.mainTabItems.filter(item => !(item.notCache)).map(item => item.key)
+      if (this.mainTabItems.some(tab => tab.isChildren)) {
+        list.push('ParentView')
+      }
+      let includeSet = new Set(list)
+      console.log('catchList', [...includeSet])
+      return [...includeSet]
+    },
   },
   watch: {
     offsetTop (val, oldVal) {

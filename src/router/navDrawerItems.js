@@ -98,13 +98,13 @@ let navDrawerItems = [
   //   children: [],
   // },
   {
-    access: 'UserAdmin',
+    // access: 'UserAdmin',
     icon: 'mdi-account-multiple',
     label: '用户管理',
     firstShow: 'user_info',
     children: [
       {
-        access: 'User',
+        // access: 'User',
         label: '登记用户管理',
         to: '/user-admin/user'
       },

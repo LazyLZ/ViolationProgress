@@ -5,6 +5,7 @@ import login from '../views/Login/login'
 import notFound from '../views/Error/notFound'
 import accessDeny from '../views/Error/accessDeny'
 import ParentView from '../components/Layout/parentView'
+// import newUser from '../views/UserAdmin/User/newUser'
 import {startLoading, stopLoading} from './loading'
 //
 // let resolveComponent = (path, loading = true) => {
@@ -219,10 +220,78 @@ export default [
         meta: {
           label: '登记用户管理',
           icon: 'mdi-account'
-        }
-      }
+        },
+      },
+      {
+        name: 'UserDetailsParent',
+        path: 'user',
+        // redirect: {name: 'UserList'},
+        component: ParentView,
+        meta: {
+          label: '登记用户管理',
+          icon: 'mdi-account'
+        },
+        children: [
+          {
+            name: 'UserDetails',
+            path: 'readonly-:loginId',
+            component: () => import(/* webpackChunkName: "useradmin" */ '../views/UserAdmin/User/userDetails'),
+            props: true,
+            meta: {
+              label: '用户详情',
+              subText: 'params.loginId',
+              cacheKey: 'query.id'
+            },
+          },
+          {
+            name: 'NewUser',
+            path: 'new',
+            component: () => import(/* webpackChunkName: "useradmin" */ '../views/UserAdmin/User/newUser'),
+            // component: newUser,
+            props: true,
+            meta: {
+              label: '新增用户',
+              beforeCloseName: 'defaultBeforeClose'
+            },
+          },
+          {
+            name: 'EditUser',
+            path: 'edit-:loginId',
+            component: () => import(/* webpackChunkName: "useradmin" */ '../views/UserAdmin/User/editUser'),
+            // component: newUser,
+            props: true,
+            meta: {
+              label: '编辑用户',
+              subText: 'params.loginId',
+              cacheKey: 'query.id',
+              beforeCloseName: 'defaultBeforeClose'
+            },
+          }
+        ]
+      },
     ]
   },
+  // {
+  //   path: '/user-admin2',
+  //   name: 'UserAdmin2',
+  //   component: Main,
+  //   meta: {
+  //     disabled: true,
+  //     label: '用户管理2'
+  //   },
+  //   children: [
+  //     {
+  //       name: 'UserNewParent',
+  //       path: 'user',
+  //       // redirect: {name: 'UserList'},
+  //       component: ParentView,
+  //       meta: {
+  //         label: '登记用户管理',
+  //         icon: 'mdi-plus'
+  //       },
+  //     }
+  //   ]
+  // },
   {
     path: '*',
     redirect: '/not-found'

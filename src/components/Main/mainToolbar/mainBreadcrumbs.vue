@@ -27,7 +27,8 @@ import F from '@/utils/functional'
 let HOME_PAGE_NAME = 'Home'
 let routeToBread = function (route) {
   return {
-    text: `${route.meta.label || route.name || ''} ${F.getAttr(route, route.meta.subText) || ''}`,
+    text: `${route.meta.label || route.name || ''}`,
+    // text: `${route.meta.label || route.name || ''} ${F.getAttr(route, route.meta.subText) || ''}`,
     disabled: !!route.meta.disabled,
     to: route.fullPath || route.path,
     name: route.name || '',

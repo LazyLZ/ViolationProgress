@@ -102,7 +102,7 @@ export let time = {
     if (o instanceof Date) {
       return this.dateToStr(o, format)
     }
-    else if (!isNaN(o)) {
+    else if (typeof o === 'number' || !!o) {
       return this.dateToStr(new Date(o))
     }
     else if (o === 'now') {
@@ -126,6 +126,9 @@ export let time = {
     let reg = new RegExp(pattern, 'gm')
     let groups = reg.exec(s) || []
 
+    console.log('parse params', params)
+    console.log('parse pattern', pattern)
+    console.log('parse groups', groups)
     let v = {}
     for (let key of Object.keys(transRegMap)) {
       v[key.slice(1)] = params.indexOf(key) === -1 ? null : groups[params.indexOf(key) + 1] || null

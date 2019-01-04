@@ -1,9 +1,10 @@
 <template>
   <div>
-    <!--<div>{{cache}}</div>-->
-    <slot :data="data_" :id="id" v-if="!isError && !isLoading"></slot>
+    <!--<div>cache {{id}} {{hasLoadingPage}} {{hasErrorPage}}</div>-->
+    <slot :data="data_" :id="id" v-if="!isError && !isLoading && isRouterIn"></slot>
     <slot name="loading" v-if="isLoading && !isError"></slot>
     <slot :code="errorCode" :message="errorMessage" name="error" v-if="isError"></slot>
+    <!--<div>{{cache}}</div>-->
   </div>
 </template>
 
@@ -18,6 +19,8 @@ export default {
     error: {type: Boolean, default: false}
   },
   data: () => ({
+    routeName: '',
+    isRouterIn: true,
     cache: {},
     errorMessage: '',
     errorCode: 0,
@@ -43,6 +46,10 @@ export default {
     }
   },
   watch: {
+    '$route' (to, from) {
+      this.isRouterIn = to.name === this.routeName
+      // console.log('$route change', to.fullPath, from.fullPath, this.$route.name)
+    },
     lastCloseTab (val) {
       console.log('closeTab', val)
       if (val instanceof Object && val.cacheKey) {
@@ -121,11 +128,12 @@ export default {
     }
   },
   created () {
-    console.log('create')
+    this.routeName = this.$route.name
+    console.log('create', this.routeName)
     if (this.id) {
       this.refreshData(this.id)
     }
-  }
+  },
 }
 </script>
 

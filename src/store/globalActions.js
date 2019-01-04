@@ -2,7 +2,7 @@ import axios from 'axios'
 import {handleError} from './handleError'
 import {LError} from '../utils/SpavaObj'
 import {SearchParam} from '../utils/searchParam'
-
+import F from '../utils/functional'
 export default {
   alert ({commit}, attr) {
     commit('$L/openAlert', attr)
@@ -27,7 +27,7 @@ export default {
       // console.log('axios', config)
       res = await axios(config)
       // console.log('res', res)
-      if (checkStatus && res.data.status + '' === '1') {
+      if (checkStatus && res.data.statusCode + '' === '200') {
         return res.data.data
       }
       else if (!checkStatus) {
@@ -56,7 +56,7 @@ export default {
       sortStack = [],
       filter = {},
       search = {},
-      transform,
+      transDict,
       url,
       method = 'post',
       ...args
@@ -77,6 +77,9 @@ export default {
     if (!sp) {
       sp = (new SearchParam(pagination, sortStack, filter, search)).create()
     }
+    if (transDict instanceof Object) {
+      F.transformIO(sp, transDict)
+    }
     // // 暂时屏蔽creationTime
     // if (sp.hasOwnProperty('creationTime')) {
     //   // logger.info('delete creationTime', sp.creationTime)
@@ -90,15 +93,15 @@ export default {
         'searchParam': sp
       },
       params: {
-        page: pagination.page - 1 || 0,
+        page: pagination.page || 1,
         size: pagination.rowsPerPage || 10
       },
       ...args
     }, {root: true})
 
-    if (data instanceof Object && data.content instanceof Array && !isNaN(data.totalElements)) {
-      let items = data.content
-      let amount = data.totalElements
+    if (data instanceof Object && data.list instanceof Array && !isNaN(data.total)) {
+      let items = data.list
+      let amount = data.total
       return {items: items, amount: amount}
     }
     else if (data.data instanceof Array) {

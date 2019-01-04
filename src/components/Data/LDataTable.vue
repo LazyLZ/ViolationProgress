@@ -1,193 +1,202 @@
 <template>
-  <v-card :flat="smallScreen || flat">
-    <v-card-title style="height: 64px" v-if="!hideTitle && !hideTitle_">
-      <slot name="title">
-        <v-flex align-center layout row>
-          <span class="subheading ml-2 pr-4">{{titleText}}</span>
-          <v-switch
-            :label="switchLabel"
-            v-if="titleSwitch"
-            v-model="switchValue"
-          ></v-switch>
-        </v-flex>
-      </slot>
-      <v-spacer></v-spacer>
-      <slot name="title-search">
-        <v-text-field
-          :label="searchText"
-          append-icon="mdi-magnify"
-          class="my-0 pt-0 hidden-xs-only"
-          hide-details
-          single-line
-          v-if="!hideTitleSearch"
-          v-model="search"
-        ></v-text-field>
-      </slot>
-      <div class="ml-3" v-if="!hideRefresh||(filterItems && !persistentFilter)"></div>
-      <v-tooltip bottom>
-        <v-btn @click.stop="filter = !filter" icon slot="activator" v-if="filterItems && !persistentFilter"
-               v-model="filter">
-          <v-icon>$vuetify.icons.filter</v-icon>
-        </v-btn>
-        <span>筛选</span>
-      </v-tooltip>
-      <v-tooltip bottom v-if="!hideRefresh">
-        <v-btn
-          @click="refreshData_()"
-          icon
-          slot="activator"
-        >
-          <v-icon>$vuetify.icons.refresh</v-icon>
-        </v-btn>
-        <span>刷新</span>
-      </v-tooltip>
-      <slot name="title-action"></slot>
-    </v-card-title>
-    <v-divider></v-divider>
-    <v-expand-transition>
-      <div :key="'filter'" class="filter" v-if="filter">
-
-        <!--筛选插槽-->
-        <slot name="filter">
-          <v-container class="pb-3" fluid grid-list-md v-if="filterItems && filterItems.length > 0">
-            <v-form ref="filterForm">
-              <v-layout row wrap>
-                <v-flex
-                  :class="item.layout"
-                  :key="'flex' + i"
-                  :ref="'filter' + i"
-                  v-for="(item, i) in filterItems"
-                >
-                  <l-input
-                    :config="item"
-                    v-model="item.value"
-                  ></l-input>
-                </v-flex>
-              </v-layout>
-              <v-layout row wrap>
-                <v-flex>
-                  <v-btn @click="getData_(initPage)" class="mx-0" color="primary" flat small>
-                    筛选
-                  </v-btn>
-                  <v-btn @click="resetFilter()" color="grey" flat small>
-                    重置
-                  </v-btn>
-                </v-flex>
-              </v-layout>
-            </v-form>
-          </v-container>
+  <div>
+    <v-divider v-if="smallScreen && !flat"></v-divider>
+    <v-card :flat="smallScreen || flat">
+      <v-card-title style="height: 64px" v-if="!hideTitle && !hideTitle_">
+        <slot name="title">
+          <v-flex align-center layout row>
+            <span class="subheading ml-2 pr-4">{{titleText}}</span>
+            <v-switch
+              :label="switchLabel"
+              v-if="titleSwitch"
+              v-model="switchValue"
+            ></v-switch>
+          </v-flex>
         </slot>
-      </div>
-    </v-expand-transition>
-    <div :key="'table'">
-      <v-divider v-if="filter"></v-divider>
-      <v-data-table
-        :disable-initial-sort="!mustSort && !initSortBy"
-        :headers="headers"
-        :hide-actions="hideActions || hideActions_"
-        :hide-headers="hideHeaders || hideHeaders_"
-        :item-key="itemKey"
-        :items="(error || errorData.error) ? [] : data_"
-        :loading="loading || loading_"
-        :must-sort="mustSort"
-        :no-results-text="noResultsText"
-        :pagination.sync="pagination"
-        :rows-per-page-items="rowsPerPageItems"
-        :search="innerSort?search:undefined"
-        :select-all="selectable"
-        :total-items="innerSort ? undefined : (error || errorData.error) ? 0 : computeTotal"
-        rows-per-page-text="每页行数"
-        v-model="selected_"
-      >
-        <template slot="no-data">
-          <slot :error="error ? errorMessage : errorData" :loading="loading_ || loading" name="no-data">
-            <v-flex class="body-2 text-xs-center">
-              <div v-if="loading_ || loading">{{loadingText}}</div>
-              <div v-else-if="error">
-                <span>加载出错</span><span v-if="errorMessage">: {{errorMessage}}</span>
-                <v-btn @click="getData_(initPage)" class="mx-2" color="primary" flat>重新加载</v-btn>
-              </div>
-              <div v-else-if="errorData.error">
-                <span>加载出错: {{errorData.message}}, code: {{errorData.code || 0}}</span>
-                <v-btn @click="getData_(initPage)" class="mx-2" color="primary" flat>重新加载</v-btn>
-              </div>
-              <div class="grey--text" v-else>{{noDataText}}</div>
-            </v-flex>
-          </slot>
-        </template>
-        <template slot="items" slot-scope="p">
-          <tr :active="p.selected" :style="clickable ? 'cursor: pointer':''"
-              @click="clickRow(p.item, p.index, p.selected)">
-            <td style="width: 80px" v-if="selectable">
-              <div @click.stop style="width: 0">
-                <v-checkbox
-                  hide-details
-                  primary
-                  v-model="p.selected"
-                ></v-checkbox>
-              </div>
-            </td>
-            <td
-              :class="['text-xs-' + (header.align||'left')]"
-              :key="i"
-              v-for="(header, i) in headers"
-              v-if="header.value"
-            >
-              <div>
-                <v-tooltip :disabled="!header.tooltip" bottom max-width="48em">
-                  <div
-                    :class="header.maxWidth? 'hide-more-content':'' "
-                    :style="header.maxWidth?'max-width: ' + header.maxWidth:''"
-                    class="d-inline-block"
-                    slot="activator"
-                  >
-                    <div
-                      :class="header.monospaced? 'monospaced':''"
-                      :style="header.monospaced? {'width': header.monospaced + '!important'}:''"
-                      v-if="tdItemValue(p.item[header.value], header) || !header.placeholder"
-                    >{{tdItemValue(p.item[header.value], header)}}
-                    </div>
-                    <span class="grey--text" v-else>{{header.placeholder}}</span>
-                  </div>
-                  <span>{{tdItemValue(p.item[header.value], header)}}</span>
-                </v-tooltip>
-                <span class="grey--text caption pl-4"
-                      v-if="header.remark && header.remark.filter(p.item[header.value])">{{header.remark.text}}</span>
-              </div>
-              <!--<div v-else>-->
-              <!--<div-->
-              <!--:style="header.maxWidth?'max-width: ' + header.maxWidth:''"-->
-              <!--:class="header.maxWidth? 'hide-more-content':'' "-->
-              <!--&gt;-->
-              <!--<span v-if="tdItemValue(p.item[header.value], header) || !header.placeholder">{{tdItemValue(p.item[header.value], header)}}</span>-->
-              <!--<span v-else class="grey&#45;&#45;text">{{header.placeholder}}</span>-->
-              <!--</div>-->
-              <!--</div>-->
-            </td>
+        <v-spacer></v-spacer>
+        <slot name="title-search">
+          <v-text-field
+            :label="searchText"
+            append-icon="mdi-magnify"
+            class="my-0 pt-0 hidden-xs-only"
+            hide-details
+            single-line
+            v-if="!hideTitleSearch"
+            v-model="search"
+          ></v-text-field>
+        </slot>
+        <div class="ml-3" v-if="!hideRefresh||(filterItems && !persistentFilter)"></div>
+        <v-tooltip bottom>
+          <v-btn @click.stop="filter = !filter" icon slot="activator" v-if="filterItems && !persistentFilter"
+                 v-model="filter">
+            <v-icon>$vuetify.icons.filter</v-icon>
+          </v-btn>
+          <span>筛选</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="!hideRefresh">
+          <v-btn
+            @click="refreshData_()"
+            icon
+            slot="activator"
+          >
+            <v-icon>$vuetify.icons.refresh</v-icon>
+          </v-btn>
+          <span>刷新</span>
+        </v-tooltip>
+        <slot name="title-action"></slot>
+      </v-card-title>
+      <v-divider v-if="!hideHeaders"></v-divider>
+      <v-expand-transition>
+        <div :key="'filter'" class="filter" v-if="filter">
 
-            <!--行操作插槽-->
-            <slot :index="p.index" :item="p.item" :selected="p.selected" name="row-action"></slot>
-          </tr>
-        </template>
-        <template slot="pageText" slot-scope="props">
-          <v-layout align-center row>
-            <span>第</span>
-            <v-text-field
-              @input="jumpPage"
-              class="d-inline-block mx-2 caption pt-0 mt-0"
-              hide-details
-              single-line
-              style="width: 44px"
-              v-model="tablePage"
-            ></v-text-field>
-            <span>页</span>
-            <span>， {{props.pageStart}} - {{props.pageStop}} 条，共 {{props.itemsLength}} 条，
+          <!--筛选插槽-->
+          <slot name="filter">
+            <v-container class="pb-3" fluid grid-list-md v-if="filterItems && filterItems.length > 0">
+              <v-form ref="filterForm">
+                <v-layout row wrap>
+                  <v-flex
+                    :class="item.layout"
+                    :key="'flex' + i"
+                    :ref="'filter' + i"
+                    v-for="(item, i) in filterItems"
+                  >
+                    <l-input
+                      :config="item"
+                      v-model="item.value"
+                    ></l-input>
+                  </v-flex>
+                </v-layout>
+                <v-layout row wrap>
+                  <v-flex>
+                    <v-btn @click="getData_(initPage)" class="mx-0" color="primary" flat small>
+                      筛选
+                    </v-btn>
+                    <v-btn @click="resetFilter()" color="grey" flat small>
+                      重置
+                    </v-btn>
+                  </v-flex>
+                </v-layout>
+              </v-form>
+            </v-container>
+          </slot>
+        </div>
+      </v-expand-transition>
+      <div :key="'table'">
+        <v-divider v-if="filter"></v-divider>
+        <v-data-table
+          :disable-initial-sort="!mustSort && !initSortBy"
+          :headers="headers"
+          :hide-actions="hideActions || hideActions_"
+          :hide-headers="hideHeaders || hideHeaders_"
+          :item-key="itemKey"
+          :items="(error || errorData.error) ? [] : data_"
+          :loading="loading || loading_"
+          :must-sort="mustSort"
+          :no-results-text="noResultsText"
+          :pagination.sync="pagination"
+          :rows-per-page-items="rowsPerPageItems"
+          :search="innerSort?search:undefined"
+          :select-all="selectable"
+          :total-items="innerSort ? undefined : (error || errorData.error) ? 0 : computeTotal"
+          rows-per-page-text="每页行数"
+          v-model="selected_"
+        >
+          <template slot="no-data">
+            <slot :error="error ? errorMessage : errorData" :loading="loading_ || loading" name="no-data">
+              <v-flex class="body-2 text-xs-center">
+                <div v-if="loading_ || loading">{{loadingText}}</div>
+                <div v-else-if="error">
+                  <span>加载出错</span><span v-if="errorMessage">: {{errorMessage}}</span>
+                  <v-btn @click="getData_(initPage)" class="mx-2" color="primary" flat>重新加载</v-btn>
+                </div>
+                <div v-else-if="errorData.error">
+                  <span>加载出错: {{errorData.message}}, code: {{errorData.code || 0}}</span>
+                  <v-btn @click="getData_(initPage)" class="mx-2" color="primary" flat>重新加载</v-btn>
+                </div>
+                <div class="grey--text" v-else>{{noDataText}}</div>
+              </v-flex>
+            </slot>
+          </template>
+          <template slot="items" slot-scope="p">
+            <tr :active="p.selected" :style="clickable ? 'cursor: pointer':''"
+                @click="clickRow(p.item, p.index, p.selected)">
+              <td style="width: 80px" v-if="selectable">
+                <div @click.stop style="width: 0">
+                  <v-checkbox
+                    hide-details
+                    primary
+                    v-model="p.selected"
+                  ></v-checkbox>
+                </div>
+              </td>
+              <td
+                :class="['text-xs-' + (header.align||'left')]"
+                :key="i"
+                v-for="(header, i) in headers"
+                v-if="header.value"
+              >
+                <div>
+                  <v-tooltip :disabled="!header.tooltip" bottom max-width="48em">
+                    <div
+                      :class="header.maxWidth? 'hide-more-content':'' "
+                      :style="header.maxWidth?'max-width: ' + header.maxWidth:''"
+                      class="d-inline-block"
+                      slot="activator"
+                    >
+                      <div
+                        :class="[header.monospaced? 'monospaced':'']"
+                        :style="header.monospaced? {'width': header.monospaced + '!important'}:''"
+                        v-if="tdItemValue(p.item[header.value], header) || !header.placeholder"
+                      >
+                        <span
+                          :style="header.clickable?'cursor: point':''"
+                          @click="clickTd(i, $event, header, p)"
+                          :class="[header.clickable?'primary--text':'']"
+                        >{{tdItemValue(p.item[header.value], header)}}</span>
+                      </div>
+                      <span class="grey--text" v-else>{{header.placeholder}}</span>
+                    </div>
+                    <span>{{tdItemValue(p.item[header.value], header)}}</span>
+                  </v-tooltip>
+                  <span class="grey--text caption pl-4"
+                        v-if="header.remark && header.remark.filter(p.item[header.value])">{{header.remark.text}}</span>
+                </div>
+                <!--<div v-else>-->
+                <!--<div-->
+                <!--:style="header.maxWidth?'max-width: ' + header.maxWidth:''"-->
+                <!--:class="header.maxWidth? 'hide-more-content':'' "-->
+                <!--&gt;-->
+                <!--<span v-if="tdItemValue(p.item[header.value], header) || !header.placeholder">{{tdItemValue(p.item[header.value], header)}}</span>-->
+                <!--<span v-else class="grey&#45;&#45;text">{{header.placeholder}}</span>-->
+                <!--</div>-->
+                <!--</div>-->
+              </td>
+
+              <!--行操作插槽-->
+              <slot :index="p.index" :item="p.item" :selected="p.selected" name="row-action"></slot>
+            </tr>
+          </template>
+          <template slot="pageText" slot-scope="props">
+            <v-layout align-center row>
+              <span>第</span>
+              <v-text-field
+                @input="jumpPage"
+                class="d-inline-block mx-2 caption pt-0 mt-0"
+                hide-details
+                single-line
+                style="width: 44px"
+                v-model="tablePage"
+              ></v-text-field>
+              <span>页</span>
+              <span>， {{props.pageStart}} - {{props.pageStop}} 条，共 {{props.itemsLength}} 条，
                 {{Math.ceil(props.itemsLength/pagination.rowsPerPage)}} 页</span>
-          </v-layout>
-        </template>
-      </v-data-table>
-    </div>
-  </v-card>
+            </v-layout>
+          </template>
+        </v-data-table>
+      </div>
+    </v-card>
+    <v-divider v-if="smallScreen && !flat"></v-divider>
+  </div>
 </template>
 
 <script>
@@ -344,7 +353,7 @@ export default {
     filter: false,
     search: '',
     sortStack: [],
-    rowsPerPageItems: [5, 10, 15, 20, 30, 50, 100, 200],
+    rowsPerPageItems: [5, 10, 15, 20, 30, 50, 100],
     tablePage: 1,
     pagination: {
       sortBy: '',
@@ -487,7 +496,14 @@ export default {
     }, 300),
     clickRow (item, index, selected) {
       if (this.clickable) {
-        this.$emit('click-row', {item: item, index: index, selected: selected})
+        this.$emit('click:row', {item: item, index: index, selected: selected})
+      }
+    },
+    clickTd (tdIndex, e, header, props) {
+      if (header.clickable) {
+        let {item, index, selected} = props
+        e.stopPropagation()
+        this.$emit(`click:td:${tdIndex}`, {item, index, selected})
       }
     },
     resetFilter () {
