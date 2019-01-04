@@ -47,7 +47,6 @@ export default {
           code: -1,
           message: 'this. is  a message'
         }
-        throw e
         return {items, amount}
       }
       catch (e) {
