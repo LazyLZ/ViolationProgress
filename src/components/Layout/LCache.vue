@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!--<div>cache {{id}} {{hasLoadingPage}} {{hasErrorPage}}</div>-->
+    <!--<div>{{routeName}} {{Object.keys(cache)}}</div>-->
     <slot :data="data_" :id="id" v-if="!isError && !isLoading && isRouterIn"></slot>
     <slot name="loading" v-if="isLoading && !isError"></slot>
     <slot :code="errorCode" :message="errorMessage" name="error" v-if="isError"></slot>
@@ -84,7 +84,16 @@ export default {
     async refreshData (key) {
       try {
         this.loading_ = true
-        this.data_ = await this.getData_(key)
+        let temp = await this.getData_(key)
+        if (temp === false) {
+          return
+        }
+        if (this.id === key) {
+          this.data_ = temp
+        }
+        else {
+          this.cache[key] = temp
+        }
         this.loading_ = false
       }
       catch (e) {
@@ -99,6 +108,9 @@ export default {
       // console.log(key, method, asynchronous)
       let cache = this.cache
       if (cache.hasOwnProperty(key)) {
+        if (cache[key] === false) {
+          return false
+        }
         if (asynchronous) {
           return new Promise(resolve => {
             resolve(cache[key])
@@ -111,6 +123,7 @@ export default {
       else if (typeof method === 'function') {
         if (asynchronous) {
           return new Promise(resolve => {
+            cache[key] = false
             method(key).then(res => {
               cache[key] = res
               resolve(cache[key])
