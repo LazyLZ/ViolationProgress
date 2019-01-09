@@ -216,7 +216,7 @@ let navDrawerItems = [
       {
         // access: 'History',
         label: '历史日志查询',
-        to: '/violation-history'
+        to: '/violation/history'
       }
     ]
   },

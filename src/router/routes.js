@@ -309,7 +309,39 @@ export default [
             component: () => import(/* webpackChunkName: "violationEvent" */ '../views/ViolationEvent/violationEventDetails'),
           }
         ]
-      }
+      },
+      {
+        path: 'history',
+        component: () => import(/* webpackChunkName: "violationHistory" */ '../views/ViolationHistory/violationHistory'),
+        name: 'ViolationHistory',
+        meta: {
+          label: '历史日志查询',
+        },
+      },
+      {
+        path: 'history',
+        name: 'ViolationHistoryParent',
+        redirect: {name: 'ViolationHistory'},
+        component: ParentView,
+        meta: {
+          label: '历史日志查询',
+        },
+        children: [
+          {
+            path: 'details-:carNumber',
+            name: 'ViolationHistoryDetails',
+            props: true,
+            meta: {
+              label: '日志详情',
+              subText: 'params.carNumber'
+            },
+            component: () => import(/* webpackChunkName: "violationHistory" */ '../views/ViolationHistory/violationHistoryDetails'),
+          },
+          {
+            path: '',
+          },
+        ]
+      },
     ]
   },
   {
