@@ -215,7 +215,13 @@ export default {
       return ''
     },
     disableTransFormInputValue () {
-      return this.$store.state.platform.isApple
+      // if (this.$store.getters.platform) {
+      //   return this.$store.getters.platform.isApple
+      // }
+      // else {
+      //   return true
+      // }
+      return true
     },
     plateFormatted: {
       get () {

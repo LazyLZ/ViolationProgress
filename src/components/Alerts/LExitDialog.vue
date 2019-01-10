@@ -42,7 +42,7 @@ export default {
   },
   watch: {
     exitDialogActivate (val) {
-      console.log('open', val)
+      // console.log('open', val)
       if (val) {
         countId = setInterval(() => {
           if (this.count === 0) {

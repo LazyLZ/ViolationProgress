@@ -117,22 +117,31 @@ export let time = {
   },
 
   _parse (s, format = this.DTS) {
-    let pattern = format
-    console.log('get', s, format)
-    let params = format.match(/%[aAbBdHlmMpSwWyY%]/g)
-    params.forEach(param => {
-      pattern = pattern.replace(param, transRegMap[param])
-    })
-    let reg = new RegExp(pattern, 'gm')
-    let groups = reg.exec(s) || []
-
-    console.log('parse params', params)
-    console.log('parse pattern', pattern)
-    console.log('parse groups', groups)
     let v = {}
-    for (let key of Object.keys(transRegMap)) {
-      v[key.slice(1)] = params.indexOf(key) === -1 ? null : groups[params.indexOf(key) + 1] || null
+    if (typeof s === 'string') {
+      let pattern = format
+      // console.log('get', s, format)
+      let params = format.match(/%[aAbBdHlmMpSwWyY%]/g)
+      params.forEach(param => {
+        pattern = pattern.replace(param, transRegMap[param])
+      })
+      let reg = new RegExp(pattern, 'gm')
+      let groups = reg.exec(s) || []
+
+      // console.log('parse params', params)
+      // console.log('parse pattern', pattern)
+      // console.log('parse groups', groups)
+      for (let key of Object.keys(transRegMap)) {
+        v[key.slice(1)] = params.indexOf(key) === -1 ? null : groups[params.indexOf(key) + 1] || null
+      }
     }
+    else if (s instanceof Date) {
+      for (let key of Object.keys(transMap)) {
+        let fn = transMap[key]
+        v[key.slice(1)] = fn(s)
+      }
+    }
+
     return v
   },
 
@@ -156,7 +165,7 @@ export let time = {
     if (!v.H && !v.l) return null
     if (!v.M) return null
     let date = new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute), Number(second))
-    console.log('result', date)
+    // console.log('result', date)
 
     return date
     // console.log(v)
@@ -207,13 +216,29 @@ export let time = {
   addDay (date, day, format = this.DTS) {
 
   },
-  // date is Date() or string
-  addHour (date, hour, format = this.DTS) {
 
+  addHour (s, hour, format = this.DTS) {
+    let d = this.parse(s, format)
+    if (d) {
+      // console.log('set before', this.stringify(d, format))
+      d.setHours(d.getHours() + hour)
+      // console.log('set after', this.stringify(d, format))
+      return time.stringify(d, format)
+    }
+    else {
+      return null
+    }
   },
-  // date is Date() or string
-  addMinute (date, minute, format = this.DTS) {
 
+  addMinute (s, minute, format = this.DTS) {
+    let d = this.parse(s, format)
+    if (d) {
+      d.setMinutes(d.getMinutes() + minute)
+      return time.stringify(d, format)
+    }
+    else {
+      return null
+    }
   },
   // date is Date() or string
   addSecond (date, second, format = this.DTS) {

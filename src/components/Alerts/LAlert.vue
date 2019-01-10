@@ -81,7 +81,7 @@ export default {
         }
       },
       set (val) {
-        console.log(`set value_: ${this.value}, activate: ${this.activate}`)
+        // console.log(`set value_: ${this.value}, activate: ${this.activate}`)
         // console.log('set', val, this.isError, this.isSuccess, this.isDialog, this.isSnackbar)
         if (this.value === undefined) {
           this.activate = val
@@ -94,7 +94,7 @@ export default {
   },
   watch: {
     value (val) {
-      console.log('set value', val)
+      // console.log('set value', val)
       if (val !== undefined) {
         this.value_ = val
       }

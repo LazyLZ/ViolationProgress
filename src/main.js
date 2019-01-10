@@ -11,9 +11,11 @@ import axios from 'axios'
 import cfg from './config'
 import F from './utils/functional'
 import './utils/accessDeny'
-
+import './utils/logger'
+import rules from './utils/rules'
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
+Vue.prototype.$rules = rules
 Vue.prototype.$L = {
   cfg,
   F

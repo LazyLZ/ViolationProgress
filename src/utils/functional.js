@@ -154,6 +154,7 @@ let getAttr = function (o, attr, own = false, nested = true, seq = '.') {
 
   return tmp
 }
+
 function deepClone (obj) {
   if (obj === null || typeof (obj) !== 'object' || 'isActiveClone' in obj) {
     return obj
@@ -176,6 +177,7 @@ function deepClone (obj) {
 
   return temp
 }
+
 function transformIO (inObject, transDict, mode = 'strict') {
   if (!(inObject instanceof Object)) {
     // throw Error('输入类型不正确: ' + typeof inObject)
@@ -252,6 +254,7 @@ function transformIO (inObject, transDict, mode = 'strict') {
   }
   return o
 }
+
 function checkType (inObject, typeList) {
   if (inObject instanceof Array) {
     inObject.forEach(item => {
@@ -301,6 +304,30 @@ function checkType (inObject, typeList) {
   }
 }
 
+function groupBy (array, key) {
+  if (!(array instanceof Array)) return {}
+  if (typeof key !== 'string') return {}
+  if (array.length < 1) return {}
+  if (!(array[0] instanceof Object)) return {}
+  if (array[0] instanceof Array) return {}
+  if (!array[0].hasOwnProperty(key)) return {}
+  let groups = {}
+  // console.log('array', array)
+  array.forEach(item => {
+    // console.log('to', item)
+    if (groups.hasOwnProperty(item[key])) {
+      // console.log('push to', item[key])
+      groups[item[key]].push(item)
+    }
+    else {
+      // console.log('add key', item[key])
+      groups[item[key]] = [item]
+    }
+  })
+
+  return groups
+}
+
 export default {
   saveToLocal,
   getFromLocal,
@@ -312,4 +339,5 @@ export default {
   deleteLocal,
   transformIO,
   checkType,
+  groupBy
 }

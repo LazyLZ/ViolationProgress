@@ -1,11 +1,11 @@
 <template>
   <!--<div>-->
-    <!--//{{cacheList}}//-->
-    <transition mode="out-in">
-      <keep-alive :include="cacheList">
-        <router-view ref="child"/>
-      </keep-alive>
-    </transition>
+  <!--//{{cacheList}}//-->
+  <transition mode="out-in">
+    <keep-alive :include="cacheList">
+      <router-view ref="child"/>
+    </keep-alive>
+  </transition>
   <!--</div>-->
 </template>
 <script>
@@ -19,13 +19,12 @@ export default {
       return [(this.$route.meta && this.$route.meta.notCache) ? this.$route.name : '']
     },
     cacheList () {
-      // console.log('catchList change')
       let list = this.tagNavList.filter(item => !(item.notCache)).map(item => item.key)
       if (this.tagNavList.some(tab => tab.isChildren)) {
         list.push('ParentView')
       }
       let includeSet = new Set(list)
-      console.log('catchList', [...includeSet])
+      // console.log('catchList', [...includeSet])
       return [...includeSet]
     }
   },

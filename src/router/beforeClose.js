@@ -7,8 +7,14 @@ let defaultBeforeClose = function () {
       // text: '确认关闭此页 ？',
       text: '未提交的更改将不会保存',
       confirmText: '关闭此页',
-      onConfirm: () => resolve(true),
-      onCancel: () => resolve(false)
+      onConfirm: r => {
+        resolve(true)
+        r()
+      },
+      onCancel: r => {
+        resolve(false)
+        r()
+      }
     })
   })
 }

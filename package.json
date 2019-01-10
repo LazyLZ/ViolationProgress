@@ -1,6 +1,6 @@
 {
   "name": "spava",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -10,7 +10,7 @@
     "test:e2e": "vue-cli-service test:e2e"
   },
   "dependencies": {
-    "@mdi/font": "^2.6.95",
+    "@mdi/font": "^2.8.94",
     "axios": "^0.18.0",
     "lodash": "^4.17.11",
     "npm": "^6.5.0",

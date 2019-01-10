@@ -6,6 +6,7 @@ import Vuetify from 'vuetify/lib'
 // import colors from 'vuetify/es5/util/colors'
 import directives from 'vuetify/lib/directives'
 import cfg from '../config'
+
 Vue.use(Vuetify, {
   theme: {
     primary: '#00C4A4', // 170, 100, 77
@@ -26,6 +27,15 @@ Vue.use(Vuetify, {
   directives: directives,
   icons: {
     ...cfg.icons,
+    'clear': 'mdi-close',
+    'close': 'mdi-close',
+    'date': 'mdi-calendar-blank',
+    'datetime': 'mdi-calendar-today',
+    'datetimeDuration': 'mdi-calendar-range',
+    'time': 'mdi-clock',
+    'file': 'mdi-file',
+    'refresh': 'mdi-refresh',
+    'filter': 'mdi-filter-variant',
     // test: 'mdi-close-circle',
     // next: 'mdi-chevron-right',
     // prev: 'mdi-chevron-left'

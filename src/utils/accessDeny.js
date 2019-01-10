@@ -1,7 +1,7 @@
 // 添加token
 import axios from 'axios'
 import store from '../store/index'
-import {LError} from './SpavaObj'
+import {LError} from '../object/SpavaObj'
 
 let excludeUrl = new Set([
   '/shiroApi/auth',

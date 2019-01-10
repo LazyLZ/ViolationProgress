@@ -22,15 +22,16 @@ export default {
   checkPlatform (state) {
     let p = navigator.platform
     if (!p) return
-    let platform = '__UNKNOWN__'
+    let platform = 'Unknown'
     for (let key of Object.keys(availablePlatform)) {
       if (p.indexOf(key) !== -1) {
         platform = key
         break
       }
     }
+    let s = state.$L.platform
+    s.name = platform
     if (availablePlatform[platform]) {
-      let s = state.$L.platform
       switch (platform) {
         case 'Linux':
           s.isLinux = true
@@ -85,5 +86,11 @@ export default {
       $L.mainTabItems.splice(index, 1)
       F.saveToLocal('$mainTabItems', $L.mainTabItems)
     }
-  }
+  },
+  routerInTab (state, callback) {
+    state.$L.replaceTabNext = true
+    if (callback instanceof Function) {
+      callback()
+    }
+  },
 }

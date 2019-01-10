@@ -2,7 +2,7 @@
   <div>
     <v-divider v-if="smallScreen && !flat"></v-divider>
     <v-card :flat="smallScreen || flat">
-      <v-card-title style="height: 64px" v-if="!hideTitle && !hideTitle_">
+      <v-card-title class="subheading" style="height: 64px" v-if="!hideTitle && !hideTitle_">
         <slot name="title">
           <v-flex align-center layout row>
             <span class="subheading ml-2 pr-4">{{titleText}}</span>
@@ -149,9 +149,9 @@
                         v-if="tdItemValue(p.item[header.value], header) || !header.placeholder"
                       >
                         <span
+                          :class="[header.clickable?'primary--text':'']"
                           :style="header.clickable?'cursor: point':''"
                           @click="clickTd(i, $event, header, p)"
-                          :class="[header.clickable?'primary--text':'']"
                         >{{tdItemValue(p.item[header.value], header)}}</span>
                       </div>
                       <span class="grey--text" v-else>{{header.placeholder}}</span>
@@ -193,6 +193,7 @@
             </v-layout>
           </template>
         </v-data-table>
+        <slot name="btn"></slot>
       </div>
     </v-card>
     <v-divider v-if="smallScreen && !flat"></v-divider>
@@ -265,7 +266,6 @@ export default {
     },
     initPagination: {
       type: Object,
-      default: () => ({})
     },
     selected: {
       type: Array,
@@ -560,7 +560,7 @@ export default {
       this.loading_ = false
     },
 
-    async refreshData (init = false, payload) {
+    async refresh (init = false, payload) {
       let pagination = init ? this.initPage : null
       await this.getData_(pagination, payload)
       return {items: this.data_, amount: this.totalItems_ || this.totalItems}
@@ -583,25 +583,31 @@ export default {
       this.filter = true
     }
 
-    if (this.mustSort && (!this.initPagination && !this.initSortBy)) {
-      logger.error('[LDataTable]', '若指定must-sort，必须指定init-sort-by属性或init-pagination')
-    }
+    // if (this.mustSort && (!this.initPagination && !this.initSortBy)) {
+    //   logger.error('[LDataTable]', '若指定must-sort，必须指定init-sort-by属性或init-pagination')
+    // }
     let h = this.headers.find(h => h.sortable !== false)
     if (!h && this.mustSort) {
       logger.error('[LDataTable]', '若指定must-sort，必须至少有一列数据可排序 (sortable !== false)')
     }
-
+    else {
+      this.pagination.sortBy = h.value
+      // console.log('sort by ', h, Object.assign({},this.pagination))
+    }
     let pagination = this.pagination
     let initPage = this.initPage
+
     if (this.initPagination instanceof Object) {
-      initPage.sortBy = pagination.sortBy = this.initPagination.sortBy
+      initPage.sortBy = pagination.sortBy = this.initPagination.sortBy || pagination.sortBy
       initPage.descending = pagination.descending = this.initPagination.descending || false
       initPage.page = pagination.page = this.initPagination.page || 1
       initPage.rowsPerPage = pagination.rowsPerPage = this.initPagination.rowsPerPage || 10
     }
     if (this.initSortBy) {
+      // console.log('init', this.initSortBy)
       initPage.sortBy = pagination.sortBy = this.initSortBy
     }
+    // console.log('Datetable key', this.pagination)
 
     // logger.debug('row action', this.$scopedSlots)
   }

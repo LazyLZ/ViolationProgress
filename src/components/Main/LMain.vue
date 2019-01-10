@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-app :dark="dark">
     <main-nav-drawer>
       <template slot="logo" slot-scope="{mini}">
         <slot :mini="mini" name="logo">
@@ -30,17 +30,23 @@
           <v-progress-linear class="py-0 my-0" height="2" indeterminate v-if="pageLoading"></v-progress-linear>
           <main-tabs></main-tabs>
         </template>
+        <!--//{{replaceTabNext}}//-->
         <!--//{{cacheList}}//{{notCachePage}}//-->
-        <transition mode="out-in">
+        <transition
+          @after-enter="afterEnter"
+          @after-leave="afterLeave"
+          @enter="enter"
+          @leave="leave"
+          mode="out-in">
           <keep-alive :include="cacheList">
             <router-view/>
           </keep-alive>
         </transition>
       </l-fixed-window>
     </v-content>
-    <slot v-if="$route.meta.showFooter" name="footer">
+    <slot name="footer" v-if="$route.meta.showFooter">
     </slot>
-  </div>
+  </v-app>
 </template>
 
 <script>
@@ -82,6 +88,7 @@ export default {
       'floatingTabs',
       'mainTabItems',
       'pageLoading',
+      'replaceTabNext',
       // 'globalAlert',
       // 'globalAlertActivate',
       // 'globalOperation',
@@ -94,7 +101,7 @@ export default {
         list.push('ParentView')
       }
       let includeSet = new Set(list)
-      console.log('catchList', [...includeSet])
+      // console.log('catchList', [...includeSet])
       return [...includeSet]
     },
   },
@@ -108,25 +115,28 @@ export default {
       }
     },
     '$route' (to, from) {
-      console.log('$route change', to.fullPath, from.fullPath, to)
-      let route = this.$route
-      if (route.meta.notCache) {
-        this.notCachePage.push(route.name)
-      }
-      else if (route.name) {
-        let i = this.notCachePage.indexOf(route.name)
-        if (i !== -1) {
-          this.notCachePage.splice(i, 1)
-        }
-      }
+      // console.log('$route change', to.fullPath, from.fullPath, to)
+      // let route = this.$route
+      // if (route.meta.notCache) {
+      //   this.notCachePage.push(route.name)
+      // }
+      // else if (route.name) {
+      //   let i = this.notCachePage.indexOf(route.name)
+      //   if (i !== -1) {
+      //     this.notCachePage.splice(i, 1)
+      //   }
+      // }
       this.$refs.fixedWindow.refresh()
       let t = this.mainTabItems.find(item => item.to === to.fullPath)
       if (t) {
         // this.tab = this.tabItems.indexOf(t)
       }
+      else if (this.replaceTabNext) {
+        this.$store.commit('$L/replaceTab', {route: this.$route, index: from.fullPath})
+        // this.tabItems.push({key: route.name, label: route.name, to: route.path})
+      }
       else {
         this.$store.commit('$L/addTab', this.$route)
-        // this.tabItems.push({key: route.name, label: route.name, to: route.path})
       }
     },
     mainTabItems (val) {
@@ -137,6 +147,38 @@ export default {
     }
   },
   methods: {
+    enter (el) {
+      let p = document.getElementsByTagName('body')[0]
+      let h = document.getElementsByTagName('html')[0]
+      if (p) {
+        p.style.overflow = 'hidden'
+        h.style.overflow = 'hidden'
+      }
+    },
+    afterEnter (el) {
+      let h = document.getElementsByTagName('html')[0]
+      let p = document.getElementsByTagName('body')[0]
+      if (p) {
+        p.style.overflow = null
+        h.style.overflow = null
+      }
+    },
+    leave (el) {
+      let h = document.getElementsByTagName('html')[0]
+      let p = document.getElementsByTagName('body')[0]
+      if (p) {
+        p.style.overflow = 'hidden'
+        h.style.overflow = 'hidden'
+      }
+    },
+    afterLeave (el) {
+      let h = document.getElementsByTagName('html')[0]
+      let p = document.getElementsByTagName('body')[0]
+      if (p) {
+        p.style.overflow = null
+        h.style.overflow = null
+      }
+    },
     onResize () {
       this.viewHeight = window.innerHeight
     },
@@ -148,7 +190,7 @@ export default {
     }
   },
   created () {
-    console.log('in main', this.$route)
+    // console.log('in main', this.$route)
     this.$store.commit('$L/recoveryTab', this.$route)
   },
 }

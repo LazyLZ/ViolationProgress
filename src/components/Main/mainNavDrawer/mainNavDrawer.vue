@@ -1,8 +1,8 @@
 <template>
   <v-navigation-drawer
     :class="dark? 'grey darken-3':'blue-grey darken-4'"
-    :mini-variant="smallScreen ? false : !mainNavDrawer"
-    :permanent="!smallScreen"
+    :mini-variant="(smallScreen ? false : !mainNavDrawer) && !closeDrawer"
+    :permanent="!smallScreen && !closeDrawer"
     :width="$L.cfg.navDrawerWidth"
     app
     dark
@@ -143,7 +143,8 @@ export default {
   name: 'mainNavDrawer',
   components: {DrawerMenu},
   data: () => ({
-    navDrawerItems_: navDrawerItems
+    navDrawerItems_: navDrawerItems,
+    closeDrawer: false
   }),
   computed: {
     isDevelopment () {
@@ -189,6 +190,9 @@ export default {
     ]),
     drawerModel: {
       get () {
+        if (this.closeDrawer) {
+          return false
+        }
         if (this.smallScreen) {
           return this.mainNavDrawer
         }
@@ -204,6 +208,16 @@ export default {
     }
   },
   watch: {
+    '$route' (to) {
+      let c = to.matched[0] && to.matched[0].components
+      if (c && c.default && c.default.name === 'Main') {
+        this.closeDrawer = false
+      }
+      else {
+        this.closeDrawer = true
+        console.log('close drawer', this.drawerModel)
+      }
+    },
     largeScreen (val, oldVal) {
       if (val && !oldVal) {
         this.mainNavDrawer = true
@@ -228,14 +242,18 @@ export default {
           continue
         }
         if (!nav.children) nav.children = []
-        if (!nav.access) {
-          if ((this.isDevelopment && nav.development) || !nav.development) {
+        if (this.isDevelopment && nav.development) {
+          view.children = this.buildNavDrawer(nav.children, permission[nav.access] || {})
+          views.push(view)
+        }
+        else if (!nav.access) {
+          if (!nav.development) {
             view.children = this.buildNavDrawer(nav.children, {})
             views.push(view)
           }
         }
         else if (this.havPermission(permission, nav.access)) {
-          view.children = this.buildNavDrawer(nav.children, permission[nav.access])
+          view.children = this.buildNavDrawer(nav.children, permission[nav.access] || {})
           views.push(nav)
         }
       }

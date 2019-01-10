@@ -41,7 +41,9 @@ let getPersistentTab = function () {
 }
 const state = {
   dark: false,
+  replaceTabNext: false,
   platform: {
+    name: '',
     isApple: false, // ios || macOS
     isWindows: false,
     isIOS: false, // iPhone || ipad
@@ -74,10 +76,8 @@ const state = {
     cancelText: '取消',
     confirmText: '确认',
     width: '350px',
-    onCancel: () => {
-    },
-    onConfirm: () => {
-    },
+    onCancel: undefined,
+    onConfirm: undefined
   },
   globalOperationActivate: false
   // bcItems: []
@@ -101,6 +101,37 @@ const mutations = {
       F.saveToLocal('$mainTabItems', state.mainTabItems)
     }
   },
+  routerInTab (state, callback) {
+    state.replaceTabNext = true
+    if (callback instanceof Function) {
+      callback()
+    }
+  },
+  replaceTab (state, {route, index}) {
+    if (!route) return
+    let i = -1
+    if (typeof index === 'number') {
+      i = index
+    }
+    if (typeof index === 'string') {
+      i = state.mainTabItems.findIndex(tab => tab.to === index)
+      // console.log('find', state.mainTabItems.find(tab => tab.to === i), state.mainTabItems.map(tab => tab.to))
+    }
+    let tab = routeToTab(route)
+    // console.log('replace route', route, index, i)
+
+    if (tab) {
+      if (i < 0) {
+        state.mainTabItems.push(tab)
+      }
+      else {
+        state.lastCloseTab = state.mainTabItems[i]
+        state.mainTabItems.splice(i, 1, tab)
+      }
+      F.saveToLocal('$mainTabItems', state.mainTabItems)
+    }
+    state.replaceTabNext = false
+  },
   closeTab (state, i) {
     let index
     if (typeof i === 'number') {
@@ -116,15 +147,18 @@ const mutations = {
     }
   },
   changeTab (state, tabs) {
-    if (state.mainTabItems.length < tabs.length) {
-      for (let i = 0; i < state.mainTabItems.length; ++i) {
-        let tab = state.mainTabItems[i]
-        if (!tabs.find(t => t.to === tab.to)) {
-          state.lastCloseTab = tab
-          break
-        }
+    // console.log('change tabs', state.mainTabItems.length, tabs.length)
+    // if (state.mainTabItems.length >= tabs.length) {
+
+    let closed = []
+    for (let i = 0; i < state.mainTabItems.length; ++i) {
+      let tab = state.mainTabItems[i]
+      if (!tabs.find(t => t.to === tab.to)) {
+        closed.push(tab)
       }
     }
+    state.lastCloseTab = closed
+    // }
     state.mainTabItems = tabs
     F.saveToLocal('$mainTabItems', state.mainTabItems)
   },
@@ -187,8 +221,6 @@ const mutations = {
     console.log('close alert')
   },
   openOperation (state, attr) {
-    let emptyF = () => {
-    }
     state.globalOperation = {
       title: attr.title || '',
       icon: attr.icon || '',
@@ -200,8 +232,8 @@ const mutations = {
       cancelText: attr.cancelText || '取消',
       confirmText: attr.confirmText || '确认',
       width: attr.width || '350px',
-      onCancel: attr.onCancel || emptyF,
-      onConfirm: attr.onConfirm || emptyF
+      onCancel: attr.onCancel,
+      onConfirm: attr.onConfirm
     }
     state.globalOperationActivate = true
   }

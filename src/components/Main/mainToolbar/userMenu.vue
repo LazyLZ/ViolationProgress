@@ -1,10 +1,10 @@
 <template>
   <v-menu
-    bottom
     :close-on-content-click="false"
+    bottom
     close-delay="100"
-    min-width="300px"
     max-width="300px"
+    min-width="300px"
     nudge-bottom="8px"
     offset-y
     open-delay="200"
@@ -17,7 +17,7 @@
       <v-list>
         <v-list-tile avatar>
           <!--<v-list-tile-avatar>-->
-            <!--<img alt="LazyLZ" src="@/assets/lazylz_avatar.jpg">-->
+          <!--<img alt="LazyLZ" src="@/assets/lazylz_avatar.jpg">-->
           <!--</v-list-tile-avatar>-->
           <v-list-tile-avatar>
             <v-icon size="36">mdi-account-circle</v-icon>
@@ -28,7 +28,7 @@
           </v-list-tile-content>
           <v-list-tile-action>
             <v-tooltip bottom disabled>
-              <v-btn color="primary" flat slot="activator" small>个人中心</v-btn>
+              <v-btn @click="goCenter" color="primary" flat slot="activator" small>个人中心</v-btn>
               <!--<span>即将开放</span>-->
             </v-tooltip>
           </v-list-tile-action>
@@ -40,14 +40,14 @@
         <v-layout class="pl-2">
           <v-flex>
             <v-chip
-              small
               :key="i"
+              small
               v-for="(role, i) in roleList"
             >
-              {{role}}
+              {{role.name}}
             </v-chip>
             <span class="caption grey--text px-2" v-if="roleList.length > 1">共 {{roleList.length}} 个角色</span>
-            <v-btn small flat color="primary" v-if="roleList.length > 1">展开</v-btn>
+            <v-btn color="primary" flat small v-if="roleList.length > 1">展开</v-btn>
           </v-flex>
         </v-layout>
       </v-container>
@@ -98,16 +98,11 @@ export default {
   computed: {
     ...mapState({
       loginName: state => state.name,
-      loginRole: state => state.role,
       loginId: state => state.id,
+      self: state => state.self
     }),
     roleList () {
-      if (this.loginRole instanceof Array) {
-        return this.loginRole
-      }
-      else {
-        return [this.loginRole]
-      }
+      return (this.self && this.self.roleList) || []
     },
     value_: {
       get () {
@@ -129,6 +124,11 @@ export default {
     },
   },
   methods: {
+    goCenter () {
+      this.$router.push({
+        name: 'PersonalCenter'
+      })
+    },
     async logout () {
       this.logoutLoading = true
       try {

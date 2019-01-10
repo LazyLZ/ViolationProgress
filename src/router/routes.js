@@ -20,6 +20,7 @@ import {startLoading, stopLoading} from './loading'
 
 // 直接导出为路由
 export default [
+  /* -------------- 首页 -------------- */
   {
     path: '/',
     name: 'L',
@@ -29,14 +30,13 @@ export default [
       {
         path: 'home',
         name: 'Home',
-        component: () => import(/* webpackChunkName: "test" */ '../views/testPage/helloWorld'),
+        component: () => import(/* webpackChunkName: "test" */ '../views/Home/homePage'),
         meta: {
           label: '首页',
           subText: '',
           icon: 'mdi-home',
-          disabled: true, // 面包屑不能点击
           persistent: true, // 持久tab，不可关闭，tab在最左侧
-          // showFooter: true, // 显示系统footer
+          showFooter: true, // 显示系统footer
           recoverable: false, // 刷新浏览器时是否重新加载此tab
           hideInMenu: false, // 在侧边导航中隐藏
           hideInBread: false, // 在侧边导航中隐藏
@@ -49,6 +49,7 @@ export default [
       hideInBread: true,
     }
   },
+  /* -------------- 登录 -------------- */
   {
     path: '/login',
     name: 'Login',
@@ -63,6 +64,46 @@ export default [
       access: [], // 页面权限数组
     }
   },
+  /* -------------- 个人中心 ----------- */
+  {
+    path: '/personal-center',
+    name: 'PersonalCenter',
+    component: () => import(/* webpackChunkName: "personal" */ '../views/PersonalCenter/personalCenter'),
+    meta: {
+      singlePage: true, // 不在Main中显示
+    }
+  },
+  /* -------------- 通知中心 ----------- */
+  {
+    path: '/notification',
+    name: 'Notification',
+    component: () => import(/* webpackChunkName: "personal" */ '../views/Notification/notificationCenter'),
+    meta: {
+      singlePage: true, // 不在Main中显示
+    }
+  },
+  /* -------------- 开发者 ------------- */
+  {
+    path: '/developer',
+    name: 'Developer',
+    component: Main,
+    meta: {
+      hideInBread: true,
+      disabled: true
+    },
+    children: [
+      {
+        path: 'config',
+        name: 'DeveloperConfig',
+        component: () => import(/* webpackChunkName: "test" */ '../views/Developer/developerConfig'),
+        meta: {
+          label: '开发者选项',
+          icon: '$vuetify.icons.code'
+        }
+      },
+    ]
+  },
+  /* -------------- 路由测试 ----------- */
   {
     path: '/test-router-parent',
     name: 'TestRouterParent',
@@ -78,7 +119,6 @@ export default [
         component: () => import(/* webpackChunkName: "test" */ '../views/testPage/testRouter1'),
         meta: {
           label: '固定页面',
-          // persistent: true
         }
       },
       {
@@ -147,6 +187,7 @@ export default [
       },
     ],
   },
+  /* -------------- 组件调试 ----------- */
   {
     path: '/test-components',
     name: 'TestComponentsParent',
@@ -167,6 +208,7 @@ export default [
       }
     ]
   },
+  /* -------------- 系统文档 ----------- */
   {
     path: '/documents',
     component: Main,
@@ -205,12 +247,14 @@ export default [
       },
     ]
   },
+  /* -------------- 用户管理 ----------- */
   {
     path: '/user-admin',
     name: 'UserAdmin',
     component: Main,
     meta: {
       disabled: true,
+      hideInBread: true,
       label: '用户管理'
     },
     children: [
@@ -226,7 +270,7 @@ export default [
       {
         name: 'UserDetailsParent',
         path: 'user',
-        // redirect: {name: 'UserList'},
+        redirect: {name: 'UserList'},
         component: ParentView,
         meta: {
           label: '登记用户管理',
@@ -235,7 +279,7 @@ export default [
         children: [
           {
             name: 'UserDetails',
-            path: 'readonly-:loginId',
+            path: ':loginId/readonly',
             component: () => import(/* webpackChunkName: "useradmin" */ '../views/UserAdmin/User/userDetails'),
             props: true,
             meta: {
@@ -257,7 +301,7 @@ export default [
           },
           {
             name: 'EditUser',
-            path: 'edit-:loginId',
+            path: ':loginId/edit',
             component: () => import(/* webpackChunkName: "useradmin" */ '../views/UserAdmin/User/editUser'),
             // component: newUser,
             props: true,
@@ -265,53 +309,129 @@ export default [
               label: '编辑用户',
               subText: 'params.loginId',
               cacheKey: 'query.id',
-              beforeCloseName: 'defaultBeforeClose'
             },
           }
         ]
       },
     ]
   },
+  /* -------------- 违章处理 -------------- */
   {
     path: '/violation',
-    name: 'ViolationParent',
-    meta: {
-      label: '违章处理',
-      disabled: true
-    },
+    name: 'Violation',
     component: Main,
+    meta: {
+      disabled: true,
+      label: '违章处理'
+    },
     children: [
       {
+        name: 'ViolationEventManagement',
         path: 'event',
-        component: () => import(/* webpackChunkName: "violationEvent" */ '../views/ViolationEvent/violationEvent'),
-        name: 'ViolationEvent',
+        component: () => import(/* webpackChunkName: "violation" */ '../views/Violation/Event/management'),
         meta: {
           label: '违章事件处理',
         },
       },
       {
-        path: 'event',
         name: 'ViolationEventParent',
-        redirect: {name: 'ViolationEvent'},
+        path: 'event',
+        redirect: {name: 'ViolationEventManagement'},
         component: ParentView,
         meta: {
           label: '违章事件处理',
         },
         children: [
           {
-            path: 'details-:carNumber',
-            name: 'ViolationDetails',
+            name: 'ViolationEventDetails',
+            path: ':plate/readonly',
+            component: () => import(/* webpackChunkName: "violation" */ '../views/Violation/Event/details'),
             props: true,
             meta: {
-              label: '违章详情',
-              subText: 'params.carNumber'
+              label: '事件详情',
+              subText: 'params.plate',
+              cacheKey: 'query.id'
             },
-            component: () => import(/* webpackChunkName: "violationEvent" */ '../views/ViolationEvent/violationEventDetails'),
+          },
+          {
+            name: 'ViolationEventSubmit',
+            path: 'new',
+            component: () => import(/* webpackChunkName: "violation" */ '../views/Violation/Event/submit'),
+            // component: newUser,
+            props: true,
+            meta: {
+              label: '上报事件',
+              beforeCloseName: 'defaultBeforeClose'
+            },
+          },
+          {
+            name: 'ViolationEventHandle',
+            path: ':plate/handle',
+            component: () => import(/* webpackChunkName: "violation" */ '../views/Violation/Event/handle'),
+            props: true,
+            meta: {
+              label: '处理事件',
+              subText: 'params.plate',
+              cacheKey: 'query.id',
+            },
           }
         ]
-      }
+      },
+      {
+        name: 'ViolationRuleManagement',
+        path: 'rule',
+        component: () => import(/* webpackChunkName: "violation" */ '../views/Violation/Rule/management'),
+        meta: {
+          label: '违章规则管理',
+        },
+      },
+      {
+        name: 'ViolationRuleParent',
+        path: 'rule',
+        redirect: {name: 'ViolationRuleManagement'},
+        component: ParentView,
+        meta: {
+          label: '违章规则管理',
+        },
+        children: [
+          {
+            name: 'ViolationRuleDetails',
+            path: ':name/readonly',
+            component: () => import(/* webpackChunkName: "violation" */ '../views/Violation/Rule/details'),
+            props: true,
+            meta: {
+              label: '违章规则',
+              subText: 'params.name',
+              cacheKey: 'query.id'
+            },
+          },
+          {
+            name: 'NewViolationRule',
+            path: 'new',
+            component: () => import(/* webpackChunkName: "violation" */ '../views/Violation/Rule/newRule'),
+            // component: newUser,
+            props: true,
+            meta: {
+              label: '新增违章规则',
+              beforeCloseName: 'defaultBeforeClose'
+            },
+          },
+          {
+            name: 'EditViolationRule',
+            path: ':name/edit',
+            component: () => import(/* webpackChunkName: "violation" */ '../views/Violation/Rule/editRule'),
+            props: true,
+            meta: {
+              label: '编辑规则',
+              subText: 'params.name',
+              cacheKey: 'query.id',
+            },
+          }
+        ]
+      },
     ]
   },
+  /* -------------- 404 -------------- */
   {
     path: '*',
     redirect: '/not-found'
@@ -324,6 +444,7 @@ export default [
       singlePage: true, // 不在Main中显示
     }
   },
+  /* -------------- 401 -------------- */
   {
     path: '/access-deny',
     name: 'AccessDeny',

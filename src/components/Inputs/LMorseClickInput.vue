@@ -11,8 +11,8 @@
 </template>
 
 <script>
-import {morse} from '../utils/morseCode'
-import _ from 'lodash'
+import debounce from 'lodash/debounce'
+import {morse} from '../../utils/morse'
 
 let tick = 250
 let start = (new Date()).getTime()
@@ -80,7 +80,7 @@ export default {
       this.submit()
       return r
     },
-    submit: _.debounce(function () {
+    submit: debounce(function () {
       this.$emit('input', this.value + morse.getLetter(this.buffer))
       this.buffer = ''
     }, 3 * tick),

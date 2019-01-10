@@ -24,14 +24,14 @@
     </v-tooltip>
     <!--</color-menu>-->
     <v-tooltip bottom>
-      <v-btn icon slot="activator">
+      <v-btn @click="goNotification" icon slot="activator">
         <v-badge
           overlap=""
           size="4px"
           v-model="haveNotification"
         >
           <span slot="badge">2</span>
-          <v-icon>mdi-bell</v-icon>
+          <v-icon size="20">mdi-bell</v-icon>
         </v-badge>
       </v-btn>
       <span>系统消息</span>
@@ -93,6 +93,11 @@ export default {
     ])
   },
   methods: {
+    goNotification () {
+      this.$router.push({
+        name: 'Notification'
+      })
+    },
     inFullScreen () {
       let el = document.documentElement
       let rfs = el.requestFullScreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen

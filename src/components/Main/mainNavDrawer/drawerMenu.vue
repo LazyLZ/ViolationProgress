@@ -2,7 +2,6 @@
   <v-menu
     close-delay="200"
     nudge-right="16px"
-    nudge-top="8px"
     offset-x
     open-on-hover
     right

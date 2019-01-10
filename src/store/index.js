@@ -7,6 +7,7 @@ import globalMutations from './globalMutations'
 import globalGetters from './globalGetters'
 import parkingLot from './modules/parkingLot'
 import userAdmin from './modules/userAdmin'
+import violation from './modules/violation'
 Vue.use(Vuex)
 
 const debug = process.env.NODE_ENV !== 'production'
@@ -19,7 +20,8 @@ export default new Vuex.Store({
     $L,
     login,
     parkingLot,
-    userAdmin
+    userAdmin,
+    violation
   },
   strict: debug,
 })

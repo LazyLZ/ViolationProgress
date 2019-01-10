@@ -24,8 +24,15 @@
     <!--登录过期计时退出对话框-->
     <l-exit-dialog></l-exit-dialog>
 
-    <transition mode="out-in" name="page">
+    <transition
+      @after-enter="afterEnter"
+      @after-leave="afterLeave"
+      @enter="enter"
+      @leave="leave"
+      mode="out-in" name="page">
+      <keep-alive :include="['Main']">
       <router-view></router-view>
+      </keep-alive>
     </transition>
   </v-app>
 
@@ -64,6 +71,40 @@ export default {
       'globalOperationActivate',
     ]),
   },
+  methods: {
+    enter (el) {
+      let p = document.getElementsByTagName('body')[0]
+      let h = document.getElementsByTagName('html')[0]
+      if (p) {
+        p.style.overflow = 'hidden'
+        h.style.overflow = 'hidden'
+      }
+    },
+    afterEnter (el) {
+      let h = document.getElementsByTagName('html')[0]
+      let p = document.getElementsByTagName('body')[0]
+      if (p) {
+        p.style.overflow = null
+        h.style.overflow = null
+      }
+    },
+    leave (el) {
+      let h = document.getElementsByTagName('html')[0]
+      let p = document.getElementsByTagName('body')[0]
+      if (p) {
+        p.style.overflow = 'hidden'
+        h.style.overflow = 'hidden'
+      }
+    },
+    afterLeave (el) {
+      let h = document.getElementsByTagName('html')[0]
+      let p = document.getElementsByTagName('body')[0]
+      if (p) {
+        p.style.overflow = null
+        h.style.overflow = null
+      }
+    },
+  },
   created () {
     this.$store.commit('checkPlatform')
     // this.$store.commit('login/recoveryLogin')
@@ -72,7 +113,7 @@ export default {
 </script>
 <style>
   html, body {
-    overflow: auto !important;
+    overflow: auto;
   }
 
   .page-enter-active {

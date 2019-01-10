@@ -10,9 +10,7 @@
       right
       v-if="show"
     >
-      <v-icon>
-        <slot></slot>
-      </v-icon>
+      <v-icon>{{(icon + '').trim()}}</v-icon>
     </v-btn>
   </v-fab-transition>
 </template>
@@ -20,13 +18,16 @@
 <script>
 export default {
   name: 'LFixedBtn',
+  props: {
+    icon: {type: String, default: ''}
+  },
   data: () => ({
     show: false
   }),
   activated () {
     setTimeout(() => {
       this.show = true
-    }, 300)
+    }, 500)
   },
   deactivated () {
     this.show = false
@@ -34,7 +35,7 @@ export default {
   created () {
     setTimeout(() => {
       this.show = true
-    }, 300)
+    }, 500)
   }
 }
 </script>

@@ -1,41 +1,41 @@
 <template>
   <v-menu
-    :disabled="readonly || disabled"
     :close-on-content-click="false"
-    v-model="menu"
-    lazy
-    transition="scale-transition"
-    offset-y
+    :disabled="readonly || disabled"
     full-width
+    lazy
     max-width="290px"
     min-width="290px"
+    offset-y
+    transition="scale-transition"
+    v-model="menu"
   >
     <v-text-field
-      slot="activator"
-      :disabled="disabled"
       :clearable="!readonly"
-      v-model="datetimeFormatted"
-      :label="label"
+      :disabled="disabled"
       :error="error"
-      :rules="[...rules, datetimeRule]"
       :hint="hint?hint:'格式：YYYY-MM-DD hh:mm'"
-      persistent-hint
-      @keyup.enter="menu = false"
+      :label="label"
       :prepend-icon="hideIcon ? '':'$vuetify.icons.datetime'"
+      :rules="[...rules, datetimeRule]"
+      @keyup.enter="menu = false"
+      persistent-hint
+      slot="activator"
+      v-model="datetimeFormatted"
     ></v-text-field>
     <v-card>
       <v-card-text class="px-0 py-0">
-        <v-layout row align-end justify-center wrap>
+        <v-layout align-end justify-center row wrap>
           <!--<v-flex xs12><h1>{{datetimeFormatted}}, {{date}}, {{time}}</h1></v-flex>-->
           <v-flex xs12>
             <v-date-picker
+              :first-day-of-week="0"
               :max="maxDate"
               :min="minDate"
               class="flat"
-              v-model="date"
-              no-title
-              :first-day-of-week="0"
               locale="zh-cn"
+              no-title
+              v-model="date"
             ></v-date-picker>
           </v-flex>
           <!--<v-flex xs6>-->
@@ -50,10 +50,11 @@
         </v-layout>
         <v-divider></v-divider>
         <v-container class="py-2" fluid grid-list-md>
-          <v-layout row align-center justify-end>
-            <v-flex xs6 class="grey--text text-xs-center subheading">{{dateFormatted}}</v-flex>
+          <v-layout align-center justify-end row>
+            <v-flex class="grey--text text-xs-center subheading" xs6>{{dateFormatted}}</v-flex>
             <v-flex xs3>
               <v-text-field
+                @wheel="wheelHour"
                 ref="hour"
                 suffix="时"
                 v-model="hour"
@@ -62,6 +63,7 @@
             <span class="mx-2">:</span>
             <v-flex xs3>
               <v-text-field
+                @wheel="wheelMinute"
                 ref="minute"
                 suffix="分"
                 v-model="minute"
@@ -79,6 +81,8 @@
 let datePattern = /^\d{4}-\d\d-\d\d$/i
 let timePattern = /^(\d\d):(\d\d)$/i
 let datetimePattern = /^(\d{4}-\d\d-\d\d) (\d\d:\d\d)$/i
+import {time} from '../../../utils/time'
+
 export default {
   name: 'LSelectDatetime',
   props: {
@@ -223,6 +227,37 @@ export default {
     }
   },
   methods: {
+    wheelMinute (e = {}) {
+      if (!e.wheelDelta) return
+      let ref = this.$refs.minute || {}
+      if (!ref.isFocused) return
+      let delta = e.wheelDelta > 0 ? 1 : -1
+      this.addMin(delta)
+    },
+
+    wheelHour (e = {}) {
+      if (!e.wheelDelta) return
+      let ref = this.$refs.hour || {}
+      if (!ref.isFocused) return
+      let delta = e.wheelDelta > 0 ? 1 : -1
+      this.addHour(delta)
+    },
+    addMin (delta) {
+      let s = time.addMinute(this.datetimeFormatted, delta, time.DT)
+      if (s) {
+        this.datetimeFormatted = s
+      }
+      // let d = new Date(year, month - 1, day)
+      // d.setDate(d.getDate() + this.maxDurationDay)
+      // return time.stringify(d, time.D)
+    },
+    addHour (delta) {
+      // console.log('add hour', delta)
+      let s = time.addHour(this.datetimeFormatted, delta, time.DT)
+      if (s) {
+        this.datetimeFormatted = s
+      }
+    },
     nowTime () {
       let t = new Date()
       return `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}`

@@ -1,12 +1,14 @@
 <template>
-  <l-cache :get-data="randValue" :id="this.$route.query.id">
-    <template slot-scope="{data, id}">
-      <h1>details page {{id}} {{data}} {{data === null}}</h1>
-    </template>
-    <template slot="loading">
-      <v-progress-circular size="50" indeterminate></v-progress-circular>
-    </template>
-  </l-cache>
+  <div>
+  <!--<l-cache :get-data="randValue" :id="this.$route.query.id">-->
+    <!--<template slot-scope="{data, id}">-->
+      <h1>details page {{pair.id}} {{pair.data}} {{pair.data === null}}</h1>
+    <!--</template>-->
+    <!--<template slot="loading">-->
+      <!--<v-progress-circular size="50" indeterminate></v-progress-circular>-->
+    <!--</template>-->
+  <!--</l-cache>-->
+  </div>
 </template>
 
 <script>
@@ -34,17 +36,17 @@ export default {
     ])
   },
   watch: {
-    '$route' (to, from) {
-      if (to.name === 'TestDetails') {
-        this.pair.value = -1
-        this.getData(this.$route.query.id, this.randValue, true).then(v => {
-          this.pair = {
-            id: this.$route.query.id,
-            value: v
-          }
-        })
-      }
-    },
+    // '$route' (to, from) {
+    //   if (to.name === 'TestDetails') {
+    //     this.pair.value = -1
+    //     this.getData(this.$route.query.id, this.randValue, true).then(v => {
+    //       this.pair = {
+    //         id: this.$route.query.id,
+    //         value: v
+    //       }
+    //     })
+    //   }
+    // },
   },
   methods: {
     randValue (key) {
