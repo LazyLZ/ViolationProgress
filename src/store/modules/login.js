@@ -103,12 +103,16 @@ const mutations = {
     state.permission = {}
     F.deleteLocal(LOGIN_INFO_KEY)
   },
-  recoveryLogin () {
+  recoveryLogin (state) {
     let info = F.getFromLocal(LOGIN_INFO_KEY) || {}
     let loginInfo = new LoginInfo(info)
     for (let key of Object.keys(loginInfo)) {
       state[key] = loginInfo[key]
     }
+    // let roleList = F.getFromLocal('role')
+    // state.self = new Person({
+    //   name:
+    // })
   },
   openExitDialog (state, {second, reason}) {
     state.exitDialog.count = second
@@ -142,6 +146,7 @@ const actions = {
     let roleList = role ? role.split(',').map((name, i) => ({id: i, name: name})) : []
     console.log('role', roleList)
     commit('saveInfo', loginInfo)
+    F.saveToLocal('role', roleList)
     commit('setSelf', {
       name: username,
       id: '__ID__',

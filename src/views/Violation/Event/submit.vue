@@ -1,5 +1,5 @@
 <template>
-  <l-layout :layout="['xs12','md10']">
+  <l-layout :layout="['xs12','lg10']">
     <vehicle-viewer :loading="vehicleLoading" :vehicle="event.vehicle" class="mb-4"
                     v-if="hasVehicleInfo"></vehicle-viewer>
     <v-card>
@@ -21,7 +21,7 @@
               </v-flex>
               <v-flex sm6 xs12>
                 <v-select
-                  :items="areaList"
+                  :items="['清水河', '沙河']"
                   :rules="$rules.required('必须填写违章区域')"
                   item-text="name"
                   item-value="id"
@@ -54,14 +54,42 @@
           <v-subheader>违章取证</v-subheader>
           <v-layout wrap>
             <v-flex xs12>
-              <l-image-view-dialog :key="i" v-for="(image, i) in images">
-                <l-image-placeholder :src="image.data" slot="activator"></l-image-placeholder>
-              </l-image-view-dialog>
-              <l-image-placeholder v-if="images.length === 0"></l-image-placeholder>
+              <template v-for="(img, i) in images">
+                <l-image-view-dialog :key="i" :src="img.src">
+                  <l-image-placeholder
+                    :error="!!img.error"
+                    :error-message="img.errorMessage"
+                    :loading="!!img.loading"
+                    :src="img.src"
+                    slot="activator"
+                    style="float:left;cursor: pointer"
+                  >
+                    <template slot="action">
+                      <v-tooltip bottom>
+                        <v-btn
+                          @click="deleteImg(i)"
+                          icon
+                          slot="activator"
+                        >
+                          <v-icon>$vuetify.icons.delete</v-icon>
+                        </v-btn>
+                        <span>删除图像</span>
+                      </v-tooltip>
+                    </template>
+                  </l-image-placeholder>
+                </l-image-view-dialog>
+              </template>
+              <template v-if="images.length === 0">
+                <l-image-placeholder></l-image-placeholder>
+              </template>
             </v-flex>
             <v-flex xs12>
-              <l-select-file>
-                <v-btn color="primary" flat slot="activator">上传图片</v-btn>
+              <l-select-file
+                @input="addFile(arguments[0],event.evidenceList)"
+                file-type="image"
+                title="添加图片"
+              >
+                <v-btn class="mx-0" color="primary" flat slot="activator">添加图片</v-btn>
               </l-select-file>
             </v-flex>
           </v-layout>
@@ -70,7 +98,7 @@
     </v-card>
     <v-layout class="mt-2 mb-5">
       <v-flex class="text-xs-right">
-        <v-btn @click="submitEvent" color="primary">提交</v-btn>
+        <v-btn :loading="submitLoading" @click="submitEvent" color="primary">提交</v-btn>
       </v-flex>
     </v-layout>
   </l-layout>
@@ -84,9 +112,11 @@ import LImagePlaceholder from '../../../components/Image/LImagePlaceholder'
 import LSelectFile from '../../../components/Inputs/LSelectFile'
 import VehicleViewer from '../../../components/vehicleViewer'
 import LSelectViolationRule from '../../../components/Inputs/LSelectViolationRule'
-import {Vehicle, ViolationRule, Evidence} from '../../../object'
+import {Vehicle, ViolationRule, Evidence, LImage} from '../../../object'
 import LImageViewDialog from '../../../components/Image/LImageViewDialog'
 
+let imageCheckType = ['jpg', 'jpeg', 'png', 'gif']
+let IMAGE_MAX_SIZE = 5 * 1000 * 1000
 export default {
   name: 'ViolationEventSubmit',
   components: {
@@ -109,6 +139,7 @@ export default {
     vehicleLoading: false,
     valid: false,
     event: null,
+    submitLoading: false,
     result: '',
     roleStrMap: {
       TRAFFIC_ADMIN: '交通管理员',
@@ -146,8 +177,25 @@ export default {
     }
   },
   methods: {
-    submitEvent () {
-      console.log('submit', this.event)
+    deleteImg (i) {
+
+    },
+    async submitEvent () {
+      try {
+        this.submitLoading = true
+        let res = await this.$store.dispatch('violation/submit', this.event)
+        console.log('submited', res)
+        this.$store.commit('closeTab', this.$route.fullPath)
+        this.$router.push({
+          name: 'ViolationEventManagement',
+        })
+      }
+      catch (e) {
+        this.$alert('error', {message: e.message})
+      }
+      finally {
+        this.submitLoading = false
+      }
     },
     async getVehicle () {
       try {
@@ -159,7 +207,7 @@ export default {
         }
         else {
           this.hasVehicleInfo = false
-          this.event.vehicle = new Vehicle()
+          this.event.vehicle = new Vehicle({plate: this.event.plate})
         }
         // console.log('get v', v)
       }
@@ -169,7 +217,84 @@ export default {
       finally {
         this.vehicleLoading = false
       }
-    }
+    },
+    async addFile (file, target) {
+      // file 实际上为fileList
+      for (let f of file) {
+        let checkType = imageCheckType
+        let maxSize = IMAGE_MAX_SIZE
+        // console.log('get file', f)
+        let suffix = /\.([^.]*)$/i.exec(f.name)[1]
+        if (checkType.indexOf(suffix) === -1) {
+          this.$store.commit('alert', {
+            type: 'error',
+            title: '上传文件格式错误',
+            message: `上传格式: ${suffix}, 支持的格式: ${checkType.join(',')}`
+          })
+          return
+        }
+        else if (f.size > maxSize) {
+          this.$store.commit('alert', {
+            type: 'error',
+            title: '文件容量过大',
+            message: `文件大小: ${Math.round(f.size / 1000)}KB, 最大限制: ${Math.round(maxSize / 1000)}KB`
+          })
+          return
+        }
+      }
+
+      let temp = new LImage()
+      temp.loading = true
+      if (target instanceof Array) {
+        target.push(new Evidence({type: Evidence.IMAGE, data: temp}))
+      }
+      else {
+        target = temp
+      }
+
+      let img = await this.uploadFile(file)
+
+      if (target instanceof Array) {
+        this.$set(target, target.length - 1, img)
+      }
+      else {
+        target = img
+      }
+    },
+    async uploadFile (files) {
+      if (files instanceof Object && files.length > 0) {
+        let file = files[0]
+        let img = new Image()
+        try {
+          let res = await this.$store.dispatch('uploadFile', {file, url: '/violationApi/violation/file'})
+          img.url = res
+        }
+        catch (e) {
+          img.error = e.message ? e.message : e + ''
+        }
+        return img
+      }
+    },
+    async getImg (img) {
+      img.loading = true
+      let path = img.url
+      let suffix = path[0] === '/' ? path.slice(1) : path
+      try {
+        let data = await this.$store.dispatch('downloadFile', {url: `/passApi/${suffix}`})
+        let reader = new FileReader()
+        reader.onload = (e) => {
+          this.$set(img, 'src', e.target.result)
+          // console.log(img, e.target)
+        }
+        reader.readAsDataURL(data)
+
+        // console.log('get Img success', src)
+      }
+      catch (e) {
+        img.error = e.code + '  ' + e.message
+      }
+      img.loading = false
+    },
   },
   created () {
     this.event = this.$store.getters['violation/getNewEvent']()

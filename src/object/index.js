@@ -7,6 +7,7 @@ import {
   Role,
 } from './UserAdmin'
 
+import {LImage} from './SpavaObj'
 import {LError} from './Error'
 
 import {
@@ -32,5 +33,6 @@ export {
   Vehicle,
   ViolationRule,
   Result,
-  Evidence
+  Evidence,
+  LImage
 }

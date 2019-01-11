@@ -3,6 +3,7 @@ import {handleError} from './handleError'
 import {LError} from '../object'
 import {SearchParam} from '../utils/searchParam'
 import F from '../utils/functional'
+
 export default {
   alert ({commit}, attr) {
     commit('$L/openAlert', attr)
@@ -115,6 +116,74 @@ export default {
         `数据格式错误,需要 data.content: Array, data.totalElements: Number`,
         1001
       )
+    }
+  },
+  async uploadFile ({dispatch, rootGetters}, {url = '', type = 'post', file, onProgress, key = 'file', extra = {}}) {
+    try {
+      let formdata = new FormData()
+      if (file instanceof File) {
+        let fileKey = key || 'file'
+        formdata.append(fileKey, file, file.name)
+      }
+      else {
+        let e = {code: 1001, message: `参数错误(files:${typeof file})，需要 File`}
+        throw e
+      }
+
+      for (let key_ of Object.keys(extra)) {
+        formdata.append(key_, extra[key_])
+      }
+
+      let F = onProgress
+
+      let message = {
+        method: type || 'post',
+        url: url || '',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        data: formdata,
+      }
+      if (typeof F === 'function') {
+        message.config.onUploadProgress = F
+      }
+      console.log('uploadFile request', message)
+      let data = await axios(message)
+      if (data.status === 1) {
+        return data.data
+      }
+      else {
+        throw data
+      }
+    }
+    catch (e) {
+      throw handleError(e)
+    }
+  },
+  async downloadFile ({dispatch, rootGetters}, {url = '', type = 'get', onProgress}) {
+    try {
+      if (typeof url !== 'string' || !url) {
+        let e = {code: 1001, message: `参数错误(files:${typeof url})，需要 String`}
+        throw e
+      }
+
+      let F = onProgress
+
+      let message = {
+        method: type || 'get',
+        url: url || '',
+        responseType: 'blob',
+      }
+      if (typeof F === 'function') {
+        message.config.onUploadProgress = F
+      }
+      console.debug('downloadFile request', message)
+      let data = await axios(message)
+      return data
+    }
+    catch (e) {
+      console.error('downloadFile() error', e)
+      throw handleError(e)
     }
   },
 }

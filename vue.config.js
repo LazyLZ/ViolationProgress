@@ -1,4 +1,5 @@
 let HOST = 'http://192.168.1.107:8080/wzcl/'
+let FILE_API = ''
 // let HOST = 'https://mva.uestc.edu.cn'
 module.exports = {
   baseUrl: process.env.NODE_ENV === 'production' ? '/' : '/',
@@ -13,27 +14,27 @@ module.exports = {
           '^/api': ''
         }
       },
-      // '/violationApi': {
-      //   target: `${HOST}:6395`,
-      //   changeOrigin: true,
-      //   pathRewrite: {
-      //     '^/violationApi': ''
-      //   }
-      // },
-      // '/messageApi': {
-      //   target: `${HOST}:6394`,
+      '/violationApi': {
+        target: `https://mva.uestc.edu.cn:6395`,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/violationApi': ''
+        }
+      },
+      // '/fileApi': {
+      //   target: `${FILE_API}`,
       //   changeOrigin: true,
       //   pathRewrite: {
       //     '^/messageApi': ''
       //   }
       // },
-      // '/passApi': {
-      //   target: `${HOST}:6393`,
-      //   changeOrigin: true,
-      //   pathRewrite: {
-      //     '^/passApi': ''
-      //   },
-      // },
+      '/passApi': {
+        target: `https://mva.uestc.edu.cn:6393`,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/passApi': ''
+        },
+      },
       // '/shiroApi': {
       //   target: `${HOST}:6396`,
       //   changeOrigin: true,

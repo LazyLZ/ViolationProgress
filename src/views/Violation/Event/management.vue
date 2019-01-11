@@ -9,8 +9,8 @@
     >
       <template slot="title">
         <span class="pr-4">待处理事件列表</span>
-        <span class="font-weight-medium body-2">角色: </span>
-        <v-menu bottom offset-y>
+        <span class="font-weight-medium body-2" v-if="roleItems.length > 1">角色: </span>
+        <v-menu bottom offset-y v-if="roleItems.length > 1">
           <v-btn color="primary" flat slot="activator">{{roleName(role)}}</v-btn>
           <v-list dense>
             <v-list-tile :key="r.id" @click="changeRole(r)" v-for="r in roleItems">{{r.name}}</v-list-tile>
@@ -29,14 +29,16 @@
       <!--</template>-->
       <template slot="row-action" slot-scope="{item}">
         <td @click.stop class="px-0 mx-0 text-xs-center">
-          <v-btn @click="handle(item)" color="primary" flat>{{role==='TRAFFIC_ADMIN' ? '查看':'处理'}}</v-btn>
+          <v-btn @click="role === 'TRAFFIC_ADMIN' ? goDetails(item) :  handle(item)" color="primary" flat>
+            {{role==='TRAFFIC_ADMIN' ? '查看':'处理'}}
+          </v-btn>
         </td>
       </template>
     </l-data-table>
     <l-fixed-btn
-      v-if="role==='TRAFFIC_ADMIN'"
       @click="submit()"
       icon="$vuetify.icons.add"
+      v-if="role==='TRAFFIC_ADMIN'"
     ></l-fixed-btn>
     <!--<l-dialog-->
     <!--hide-divider-->
@@ -67,8 +69,8 @@ export default {
   name: 'ViolationEventManagement',
   components: {LFixedBtn, LLayout, LDataTable},
   data: () => ({
-    role: 'TRAFFIC_ADMIN',
-    roleItems: [
+    role: '',
+    roleItems_: [
       {name: '交通管理员', id: 'TRAFFIC_ADMIN', status: 0, routeName: 'ViolationEventDetails'},
       {name: '报警中心管理员', id: 'ALARM_ADMIN', status: 0, routeName: 'ViolationEventPreliminary'},
       {name: '违章管理员', id: 'VIOLATION_ADMIN', status: 1, routeName: 'ViolationEventFinal'},
@@ -115,14 +117,18 @@ export default {
     // ],
     userHeaders: [
       {text: '车辆号牌', value: 'plate', align: 'left', placeholder: 'N/A'},
-      {text: '电话号码', value: 'phone', align: 'right', placeholder: 'N/A'},
-      {text: '违章区域', value: 'area', align: 'right', placeholder: 'N/A'},
+      // {text: '电话号码', value: 'phone', align: 'right', placeholder: 'N/A', sortable: false},
+      {text: '违章区域', value: 'area', align: 'right', placeholder: 'N/A', sortable: false},
       {text: '违章类型', value: 'typeName', align: 'right', placeholder: 'N/A'},
       {text: '上报时间', value: 'creationTime', align: 'right', placeholder: 'N/A', f: v => time.stringify(v)},
       {text: '', value: '', align: 'right', width: '80px', sortable: false}
     ],
   }),
   computed: {
+    roleItems () {
+      let roles = this.$store.state.login.self.roleList || []
+      return this.roleItems_.filter(r => !!roles.find(role => role.name === r.name)) || []
+    },
     roleName () {
       return (role) => {
         return (this.roleItems.find(r => r.id === role) || {}).name
@@ -130,6 +136,13 @@ export default {
     },
     routeName () {
       return (this.roleItems.find(r => r.id === this.role) || {}).routeName || ''
+    }
+  },
+  watch: {
+    '$route' (to, from) {
+      if (to.name === 'ViolationEventManagement' && from.name === 'NewViolationEvent') {
+        this.$refs.dataTable.refresh()
+      }
     }
   },
   methods: {
@@ -192,22 +205,25 @@ export default {
         search: {key: 'plate', value: search}
       })
     },
-    goDetails (status, item, force) {
+    goDetails (item, force) {
       let selectionString = document.getSelection().toString()
       if (!selectionString || force) {
         // if (status === 'new') {
         //   this.$router.push({name: 'NewUser'})
         // }
         // else {
-        //   this.$router.push({
-        //     name: 'UserDetails',
-        //     params: {loginId: item.loginId},
-        //     query: {id: item.id}
-        //   })
-        // }
+        this.$router.push({
+          name: 'ViolationEventDetails',
+          params: {plate: item.plate},
+          query: {id: item.id}
+        })
       }
     }
   },
+  created () {
+    this.role = this.roleItems.length > 0 ? this.roleItems[0].id : ''
+    // console.log(this.roleItems, this.role)
+  }
 }
 </script>
 

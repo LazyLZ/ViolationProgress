@@ -31,12 +31,14 @@ class LImage {
   errorMessage = ''
 
   constructor (o) {
-    this.loading = o.loading || false
-    this.process = o.process || false
-    this.src = o.src || null
-    this.url = o.url || ''
-    this.error = o.error || false
-    this.errorMessage = o.errorMessage || ''
+    if (o instanceof Array) {
+      this.loading = o.loading || false
+      this.process = o.process || false
+      this.src = o.src || null
+      this.url = o.url || ''
+      this.error = o.error || false
+      this.errorMessage = o.errorMessage || ''
+    }
   }
 }
 

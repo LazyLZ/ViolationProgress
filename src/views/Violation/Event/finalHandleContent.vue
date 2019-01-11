@@ -108,8 +108,8 @@
     </v-card>
     <v-layout>
       <v-flex class="text-xs-right">
-        <v-btn color="error">撤销违章</v-btn>
-        <v-btn class="mx-0" color="primary">确认违章</v-btn>
+        <v-btn :loading="cancelLoading" @click="confirmOperation" color="error">撤销违章</v-btn>
+        <v-btn :loading="confirmLoading"  @click="confirmEvent" class="mx-0" color="primary">确认违章</v-btn>
       </v-flex>
     </v-layout>
   </l-layout>
@@ -135,6 +135,8 @@ export default {
     vehicleLoading: false,
     hasVehicleInfo: false,
     message: {text: '您的车辆在清水河校区有一条违章'},
+    confirmLoading: false,
+    cancelLoading: false,
   }),
   computed: {
     ...mapState('violation', [
@@ -151,6 +153,46 @@ export default {
     }
   },
   methods: {
+    async confirmOperation () {
+      this.$store.dispatch('confirm', {
+        title: `确认撤销该违章？`,
+        text: `${this.event.plate}`,
+        onConfirm: resolve => {
+          // console.log('delete success')
+          this.cancelEvent().then(res => {
+            this.$store.dispatch('alert', {type: 'success', message: '撤销成功'})
+          }).catch(e => {
+            this.$store.dispatch('alert', {type: 'error', message: e.message})
+          }).finally(() => {
+            resolve()
+          })
+        }
+      })
+    },
+    async cancelEvent () {
+      try {
+        this.cancelLoading = true
+        await this.$store.dispatch('violation/cancel', this.event)
+      }
+      catch (e) {
+        this.$alert('error', {message: e.message})
+      }
+      finally {
+        this.cancelLoading = false
+      }
+    },
+    async confirmEvent () {
+      try {
+        this.confirmLoading = true
+        await this.$store.dispatch('violation/finalConfirm', this.event)
+      }
+      catch (e) {
+        throw e
+      }
+      finally {
+        this.confirmLoading = false
+      }
+    },
     async changeRule () {
       this.isEditRule = false
     },

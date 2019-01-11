@@ -8,21 +8,45 @@ const mutations = {}
 
 const actions = {
   async getVehicle ({dispatch}, {plate}) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(new Vehicle({
-          id: 1,
-          plate: plate || '',
+    try {
+      let v = await dispatch('getDataFromApi', {
+        method: 'get',
+        url: '/api/vehicles/' + plate
+      }, {root: true})
+      if (v) {
+        return new Vehicle({
+          plate: v.plate,
           owner: {
-            id: 1,
-            name: 'LZ',
-            phone: '18618164058',
-            email: 'laizhi727@126.com',
-            typeName: '在校学生'
+            name: v.name,
+            phone: v.phone,
+            email: v.email,
+            typeName: v.identityType
           }
-        }))
-      }, 1000)
-    })
+        })
+      }
+      else {
+        return null
+      }
+    }
+    catch (e) {
+
+    }
+    return null
+    // return new Promise(resolve => {
+    //   setTimeout(() => {
+    //     resolve(new Vehicle({
+    //       id: 1,
+    //       plate: plate || '',
+    //       owner: {
+    //         id: 1,
+    //         name: 'LZ',
+    //         phone: '18618164058',
+    //         email: 'laizhi727@126.com',
+    //         typeName: '在校学生'
+    //       }
+    //     }))
+    //   }, 1000)
+    // })
   }
 }
 
