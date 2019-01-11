@@ -1,6 +1,6 @@
 import axios from 'axios'
 import {handleError} from './handleError'
-import {LError} from '../utils/SpavaObj'
+import {LError} from '../object'
 import {SearchParam} from '../utils/searchParam'
 import F from '../utils/functional'
 export default {

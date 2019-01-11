@@ -3,8 +3,8 @@
     :close-on-content-click="false"
     bottom
     close-delay="100"
-    max-width="300px"
-    min-width="300px"
+    max-width="350px"
+    min-width="350px"
     nudge-bottom="8px"
     offset-y
     open-delay="200"
@@ -46,8 +46,8 @@
             >
               {{role.name}}
             </v-chip>
-            <span class="caption grey--text px-2" v-if="roleList.length > 1">共 {{roleList.length}} 个角色</span>
-            <v-btn color="primary" flat small v-if="roleList.length > 1">展开</v-btn>
+            <!--<span class="caption grey&#45;&#45;text px-2" v-if="roleList.length > 1">共 {{roleList.length}} 个角色</span>-->
+            <!--<v-btn color="primary" flat small v-if="roleList.length > 1">展开</v-btn>-->
           </v-flex>
         </v-layout>
       </v-container>

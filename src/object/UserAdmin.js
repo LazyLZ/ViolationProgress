@@ -168,11 +168,11 @@ class Person extends SpavaObj {
     this.groupList = []
     this.roleList = []
     if (groupList instanceof Array) {
-      this.groupList.push(...groupList.filter(g => g instanceof Group))
+      this.groupList.push(...groupList.map(g => g instanceof Group ? g : new Group(g)))
     }
 
     if (roleList instanceof Array) {
-      this.roleList.push(...roleList.filter(r => r instanceof Role))
+      this.roleList.push(...roleList.map(r => r instanceof Role ? r : new Role(r)))
     }
 
     if (institution instanceof Institution) {

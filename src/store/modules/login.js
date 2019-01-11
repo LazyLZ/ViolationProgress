@@ -1,8 +1,7 @@
 import {getField, updateField} from 'vuex-map-fields'
 import F from '@/utils/functional'
 import cfg from '@/config'
-import {Person} from '@/utils/SpavaObj'
-import {LError} from '../../utils/SpavaObj'
+import {Person, LError} from '../../object'
 
 let LOGIN_INFO_KEY = 'loginInfo'
 
@@ -87,9 +86,10 @@ const mutations = {
   setSelf (state, self = {}) {
     // console.log('set self', self)
     self.phone = self.mobilePhone
-    self.group = self.userGroups instanceof Array ? self.userGroups[0] || {} : {}
-    self.org = self.group.organizations instanceof Array ? self.group.organizations[0] || {} : {}
+    // self.group = self.userGroups instanceof Array ? self.userGroups[0] || {} : {}
+    // self.org = self.group.organizations instanceof Array ? self.group.organizations[0] || {} : {}
     state.self = new Person(self)
+    console.log('self', new Person(self))
     // console.log(new Person(self))
   },
   setPermission (state, permission) {
@@ -139,7 +139,15 @@ const actions = {
       name: username,
       id: id,
     })
+    let roleList = role ? role.split(',').map((name, i) => ({id: i, name: name})) : []
+    console.log('role', roleList)
     commit('saveInfo', loginInfo)
+    commit('setSelf', {
+      name: username,
+      id: '__ID__',
+      loginId: id,
+      roleList: roleList
+    })
     // console.log('login', loginInfo.name)
     // let loginInfo = new LoginInfo({
     //   token: '__TEST__',
@@ -176,7 +184,7 @@ const actions = {
       setTimeout(() => {
         commit('setInit', true)
         resolve()
-      }, 1000)
+      }, 600)
     })
   },
   async initControllers ({dispatch}) {
