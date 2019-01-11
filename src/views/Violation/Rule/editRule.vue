@@ -34,6 +34,11 @@
           </v-container>
         </v-card-text>
       </v-card>
+      <v-layout>
+      <v-flex class="text-xs-right">
+        <v-btn class="mx-0" :loading="loading" @click="editRule(data.id, data.name, data.severity, data.code)" color="primary">提交</v-btn>
+      </v-flex>
+      </v-layout>
     </l-layout>
   </l-cache>
 </template>
@@ -46,12 +51,43 @@ export default {
   name: 'EditViolationRule',
   components: {LCache, LLayout},
   props: ['id'],
+  data: () => ({
+    loading: false,
+  }),
   methods: {
     async getRule (key) {
       let item = await this.$store.dispatch('violation/getRules', {id: key})
       // console.log('findg', item)
       return item
+    },
+    async editRule (id, name, severity, code) {
+      // let opArray = code.split('-')
+      // let fid
+      // if (opArray.length === 1) {
+      //   fid = 0
+      // }
+      // else {
+      //   fid = opArray[opArray.length - 2]
+      // }
+      try {
+        this.loading = true
+        await this.$store.dispatch('violation/editRules', {id, name, severity, code})
+        this.$store.dispatch('alert', {type: 'success', message: '修改成功'})
+        this.$store.commit('closeTab', this.$route.fullPath)
+        this.$router.push({
+          name: 'EditViolationRule',
+          params: {name: name},
+          query: {id: id}
+        })
+      }
+      catch (e) {
+        this.$store.dispatch('alert', {type: 'error', message: e.message})
+      }
+      finally {
+        this.loading = false
+      }
     }
+
   }
 }
 </script>

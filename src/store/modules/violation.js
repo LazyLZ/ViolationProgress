@@ -277,6 +277,39 @@ const actions = {
     //     }
     //   }, 1500)
     // })
+  },
+
+  async createRules ({dispatch}, {id = '', name, severity, fid}) {
+    let data = await dispatch('getDataFromApi', {
+      method: 'post',
+      data: {
+        'id': id,
+        'name': name,
+        'serious': severity,
+        'code': fid,
+      },
+      url: '/api/regular'
+    }, {root: true})
+    return data
+  },
+
+  async deleteRules ({dispatch}, rule) {
+    dispatch('getDataFromApi', {
+      method: 'delete',
+      url: '/api/regular/' + rule.id
+    }, {root: true})
+  },
+  async editRules ({dispatch}, {id, name, severity, fid}) {
+    await dispatch('getDataFromApi', {
+      method: 'put',
+      data: {
+        'id': id,
+        'name': name,
+        'serious': severity,
+        'code': fid,
+      },
+      url: '/api/regular'
+    }, {root: true})
   }
 }
 

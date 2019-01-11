@@ -34,7 +34,7 @@ class ViolationRule extends SpavaObj {
 
   static fromAPI (o) {
     o.severity = Number(o.serious) || 0
-    console.log('set seve', o.severity)
+    // console.log('set seve', o.severity)
     return new ViolationRule(o)
   }
 }

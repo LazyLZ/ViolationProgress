@@ -37,7 +37,7 @@
     </v-card>
     <v-layout>
       <v-flex class="text-xs-right">
-        <v-btn class="mx-0" @click="" color="primary">提交</v-btn>
+        <v-btn class="mx-0" :loading="loading" @click="create(rule.name, rule.severity, $route.query.parent)" color="primary">提交</v-btn>
       </v-flex>
     </v-layout>
   </l-layout>
@@ -49,10 +49,34 @@ export default {
   name: 'NewViolationRule',
   components: {LLayout},
   data: () => ({
-    rule: null
+    rule: null,
+    loading: false,
+
   }),
   created () {
     this.rule = this.$store.getters['violation/getNewRule']()
+  },
+  methods: {
+    async create (name, severity, fid) {
+      try {
+        this.laoding = true
+        await this.$store.dispatch('violation/createRules', {
+          name,
+          severity,
+          fid
+        })
+        this.$store.commit('closeTab', this.$route.fullPath)
+        this.$router.push({
+          name: 'ViolationRuleManagement'
+        })
+      }
+      catch (e) {
+        this.$store.dispatch('alert', {type: 'error', message: e.message})
+      }
+      finally {
+        this.loading = false
+      }
+    }
   }
 }
 </script>

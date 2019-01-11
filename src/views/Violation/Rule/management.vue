@@ -8,7 +8,7 @@
           :style="{cursor: bcItems.length === 0? '':'pointer'}"
           @click="pop(rules)"
           class="subheading"
-        >违章事件列表</span>
+        >违章规则列表</span>
         <v-icon class="mx-2" v-if="bcItems.length !== 0">$vuetify.icons.chevronRight</v-icon>
         <template v-for="(item, i) in bcItems">
           <span
@@ -121,7 +121,7 @@
                       </v-list-tile-title>
                     </v-list-tile>
                     <v-list-tile
-                      @click="goNew(p.item)"
+                      @click="goSonNew(p.item)"
                     >
                       <v-list-tile-title class="pr-1">
                         <v-icon class="pr-3" small>$vuetify.icons.add</v-icon>
@@ -202,6 +202,13 @@ export default {
         }
       }
     },
+  },
+  watch: {
+    '$route' (to, from) {
+      if (to.name === 'ViolationRuleManagement' && from.name === 'NewViolationRule') {
+        this.refresh()
+      }
+    }
   },
   methods: {
     pop (item) {
@@ -295,9 +302,35 @@ export default {
         })
       }
       else {
+        let opArray = item.code.split('-')
+        let exCode
+        if (opArray.length === 1) {
+          exCode = 0
+        }
+        else {
+          exCode = opArray[opArray.length - 2]
+        }
         this.$router.push({
           name: 'NewViolationRule',
-          query: {parent: item.code}
+          query: {parent: exCode}
+        })
+      }
+    },
+    goSonNew (item) {
+      if (this.$store.getters.getTab({name: 'NewViolationRule'})) {
+        this.$store.dispatch('confirm', {
+          title: '提示',
+          icon: '$vuetify.icons.alert',
+          iconColor: 'warning',
+          text: '请您完成当前规则提交后再添加新规则',
+          disableCancel: true
+        })
+      }
+      else {
+        let opArray = item.code.split('-')
+        this.$router.push({
+          name: 'NewViolationRule',
+          query: {parent: opArray[opArray.length - 1]}
         })
       }
     },
@@ -309,6 +342,21 @@ export default {
       })
     },
     deleteRule (item) {
+      console.log('misaka', item.name, item.id, item.code)
+      this.$store.dispatch('confirm', {
+        title: '确认删除该条规则？',
+        text: item.name,
+        onConfirm: resolve => {
+          this.$store.dispatch('violation/deleteRules', item).then(res => {
+            this.$store.dispatch('alert', {type: 'success', message: '删除成功'})
+            this.refresh()
+          }).catch(e => {
+            this.$store.dispatch('alert', {type: 'error', message: e.message})
+          }).finally(() => {
+            resolve()
+          })
+        }
+      })
     }
   },
   created () {
