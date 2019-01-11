@@ -8,6 +8,8 @@ import globalGetters from './globalGetters'
 import parkingLot from './modules/parkingLot'
 import userAdmin from './modules/userAdmin'
 import violation from './modules/violation'
+import pass from './modules/pass'
+
 Vue.use(Vuex)
 
 const debug = process.env.NODE_ENV !== 'production'
@@ -21,7 +23,8 @@ export default new Vuex.Store({
     login,
     parkingLot,
     userAdmin,
-    violation
+    violation,
+    pass
   },
   strict: debug,
 })

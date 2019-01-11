@@ -146,7 +146,7 @@
                       <div
                         :class="[header.monospaced? 'monospaced':'']"
                         :style="header.monospaced? {'width': header.monospaced + '!important'}:''"
-                        v-if="tdItemValue(p.item[header.value], header) || !header.placeholder"
+                        v-if="hasValue(tdItemValue(p.item[header.value], header)) || !header.placeholder"
                       >
                         <span
                           :class="[header.clickable?'primary--text':'']"
@@ -372,6 +372,11 @@ export default {
     },
   }),
   computed: {
+    hasValue () {
+      return (v) => {
+        return v !== undefined && v !== null && v !== ''
+      }
+    },
     tdItemValue () {
       return (val, header) => {
         if (header instanceof Object && typeof header.f === 'function') {

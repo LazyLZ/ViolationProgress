@@ -22,21 +22,26 @@ class Result extends SpavaObj {
 class ViolationRule extends SpavaObj {
   name
   code
+  severity
 
   constructor (o = {}) {
     super(o)
-    this.name = o.name
-    this.code = o.code
+    o = o instanceof Object ? o : {}
+    this.name = o.name || ''
+    this.code = o.code || ''
+    this.severity = o.severity || 0
   }
 
   static fromAPI (o) {
+    o.severity = Number(o.serious) || 0
+    console.log('set seve', o.severity)
     return new ViolationRule(o)
   }
 }
 
 class Evidence extends SpavaObj {
-  static VIOCE
-  static IMAGE
+  static VIOCE = 0
+  static IMAGE = 1
 
   name = ''
   type = ''
@@ -86,6 +91,7 @@ class ViolationEvent extends SpavaObj {
     this.status = o.status
     this.area = o.area || ''
     this.description = o.description || ''
+    this.type = new ViolationRule(o.type)
     this.evidenceList = o.evidenceList instanceof Array
       ? o.evidenceList.map(e => new Evidence(e))
       : []
@@ -96,13 +102,18 @@ class ViolationEvent extends SpavaObj {
   }
 
   static fromAPI (o) {
-    let v = new ViolationEvent()
-    v.vehicle = new Vehicle(o)
-    v.status = o.status
+    // let v = new ViolationEvent()
+    // v.vehicle = Vehicle.fromAPI(o)
+    // v.status = o.status
+    return new ViolationEvent(o)
   }
 
   get typeName () {
     return this.type && this.type.name
+  }
+
+  get phone () {
+    return this.vehicle.owner.phone
   }
 
   get plate () {
@@ -112,10 +123,15 @@ class ViolationEvent extends SpavaObj {
   set plate (v) {
     this.vehicle.plate = v
   }
+
+  resetVehicle (o) {
+    this.vehicle = new Vehicle(o)
+  }
 }
 
 export {
   ViolationEvent,
   ViolationRule,
   Result,
+  Evidence
 }

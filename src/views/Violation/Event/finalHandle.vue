@@ -1,18 +1,18 @@
 <template>
   <l-cache :get-data="getEvent" :id="($route.query.id|| '').toString()">
-    <handle-content slot-scope="{data}" :event="data"></handle-content>
+    <final-handle-content slot-scope="{data}" :event="data"></final-handle-content>
   </l-cache>
 </template>
 
 <script>
 
 import LCache from '../../../components/Layout/LCache'
-import HandleContent from './handleContent'
 import {ViolationEvent} from '../../../object'
+import FinalHandleContent from './finalHandleContent'
 
 export default {
-  name: 'ViolationEventPreliminary',
-  components: {HandleContent, LCache},
+  name: 'ViolationEventFinal',
+  components: {FinalHandleContent, LCache},
   methods: {
     getEvent () {
       return new Promise(resolve => {

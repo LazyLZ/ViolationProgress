@@ -30,8 +30,8 @@
       @enter="enter"
       @leave="leave"
       mode="out-in" name="page">
-      <keep-alive :include="['Main']">
-      <router-view></router-view>
+      <keep-alive :include="[catchList]">
+        <router-view></router-view>
       </keep-alive>
     </transition>
   </v-app>
@@ -70,6 +70,10 @@ export default {
       'globalOperation',
       'globalOperationActivate',
     ]),
+    catchList () {
+      let isLogin = this.$store.getters['login/isLogin']
+      return isLogin ? ['Main'] : []
+    }
   },
   methods: {
     enter (el) {

@@ -5,18 +5,9 @@
       :headers="userHeaders"
       init-sort-by="plate"
       ref="dataTable"
-      title-text="待处理事件列表"
+      title-text="违章历史记录"
+      :filter-items="filterItems"
     >
-      <template slot="title">
-        <span class="pr-4">待处理事件列表</span>
-        <span class="font-weight-medium body-2">角色: </span>
-        <v-menu bottom offset-y>
-          <v-btn color="primary" flat slot="activator">{{roleName(role)}}</v-btn>
-          <v-list dense>
-            <v-list-tile :key="r.id" @click="changeRole(r)" v-for="r in roleItems">{{r.name}}</v-list-tile>
-          </v-list>
-        </v-menu>
-      </template>
       <!--<template slot="title-action">-->
       <!--<l-option-list-->
       <!--:options="moreActions"-->
@@ -27,17 +18,7 @@
       <!--</v-btn>-->
       <!--</l-option-list>-->
       <!--</template>-->
-      <template slot="row-action" slot-scope="{item}">
-        <td @click.stop class="px-0 mx-0 text-xs-center">
-          <v-btn @click="handle(item)" color="primary" flat>{{role==='TRAFFIC_ADMIN' ? '查看':'处理'}}</v-btn>
-        </td>
-      </template>
     </l-data-table>
-    <l-fixed-btn
-      v-if="role==='TRAFFIC_ADMIN'"
-      @click="submit()"
-      icon="$vuetify.icons.add"
-    ></l-fixed-btn>
     <!--<l-dialog-->
     <!--hide-divider-->
     <!--:auto-close="false"-->
@@ -60,12 +41,11 @@
 import LDataTable from '../../../components/Data/LDataTable'
 import {time} from '../../../utils/time'
 import LLayout from '../../../components/Layout/LLayout'
-import LFixedBtn from '../../../components/LFixedBtn'
 // import LOptionList from '../../../components/LOptionList'
 
 export default {
-  name: 'ViolationEventManagement',
-  components: {LFixedBtn, LLayout, LDataTable},
+  name: 'ViolationHistory',
+  components: {LLayout, LDataTable},
   data: () => ({
     role: 'TRAFFIC_ADMIN',
     roleItems: [
@@ -86,40 +66,40 @@ export default {
     //   checkMessage: '',
     //   loading: false
     // },
-    // filterItems: [
-    //   {
-    //     key: 'creationTime',
-    //     value: '',
-    //     label: '登记时间',
-    //     type: 'duration',
-    //     layout: ['xs12', 'sm4'],
-    //     f: v => v ? [time.toTimeStamp(v.startDatetime) || 0, time.toTimeStamp(v.endDatetime) || 9999999999999] : [0, 9999999999999],
-    //     range: true
-    //   },
-    //   {
-    //     prependIcon: '$vuetify.icons.person',
-    //     key: 'loginId',
-    //     value: '',
-    //     label: '登录ID',
-    //     type: 'input',
-    //     layout: ['xs12', 'sm4'],
-    //   },
-    //   {
-    //     prependIcon: '$vuetify.icons.phone',
-    //     key: 'phone',
-    //     value: '',
-    //     label: '电话号码',
-    //     type: 'input',
-    //     layout: ['xs12', 'sm4'],
-    //   },
-    // ],
+    filterItems: [
+      {
+        key: 'creationTime',
+        value: '',
+        label: '上报时间',
+        type: 'duration',
+        layout: ['xs12', 'sm4'],
+        f: v => v ? [time.toTimeStamp(v.startDatetime) || 0, time.toTimeStamp(v.endDatetime) || 9999999999999] : [0, 9999999999999],
+        range: true
+      },
+      {
+        prependIcon: '$vuetify.icons.description',
+        key: 'type',
+        value: '',
+        label: '违章类型',
+        type: 'input',
+        layout: ['xs12', 'sm4'],
+      },
+      {
+        prependIcon: '$vuetify.icons.location',
+        key: 'area',
+        value: '',
+        label: '违章区域',
+        type: 'input',
+        layout: ['xs12', 'sm4'],
+      },
+    ],
     userHeaders: [
       {text: '车辆号牌', value: 'plate', align: 'left', placeholder: 'N/A'},
       {text: '电话号码', value: 'phone', align: 'right', placeholder: 'N/A'},
       {text: '违章区域', value: 'area', align: 'right', placeholder: 'N/A'},
       {text: '违章类型', value: 'typeName', align: 'right', placeholder: 'N/A'},
       {text: '上报时间', value: 'creationTime', align: 'right', placeholder: 'N/A', f: v => time.stringify(v)},
-      {text: '', value: '', align: 'right', width: '80px', sortable: false}
+      // {text: '', value: '', align: 'right', width: '80px', sortable: false}
     ],
   }),
   computed: {

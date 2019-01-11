@@ -12,11 +12,9 @@ class Vehicle extends SpavaObj {
     if (typeof o === 'string') {
       this.plate = o
     }
-    if (o instanceof Object) {
-      if (o.owner instanceof Person) {
-        this.owner = o.owner
-      }
-    }
+    o = o instanceof Object ? o : {}
+    this.plate = o.plate || ''
+    this.owner = new Person(o.owner)
   }
 
   get name () {
@@ -31,8 +29,15 @@ class Vehicle extends SpavaObj {
     return this.owner && this.owner.orgGroupName
   }
 
-  get type () {
-    return this.owner && this.owner.authType
+  get typeName () {
+    return this.owner && this.owner.typeName
+  }
+  get email () {
+    return this.owner && this.owner.email
+  }
+
+  static fromAPI (o) {
+    return new Vehicle(o)
   }
 }
 

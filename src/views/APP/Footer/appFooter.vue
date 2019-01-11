@@ -17,10 +17,10 @@
         >{{passwordInput}}</span>
       </v-flex>
       <v-flex xs12 sm8>
-        <span class="grey--text caption">&copy;{{(new Date()).getFullYear()}} 电子科技大学党委保卫部（保卫处）</span>
-        <br v-if="xsScreen">
-        <span v-else class="px-2"></span>
-        <span class="grey--text caption">技术支持：阳辰科技</span>
+        <span class="grey--text caption">&copy;{{(new Date()).getFullYear()}} Create by LZ</span>
+        <!--<br v-if="xsScreen">-->
+        <!--<span v-else class="px-2"></span>-->
+        <!--<span class="grey&#45;&#45;text caption">技术支持：阳辰科技</span>-->
       </v-flex>
       <v-flex class="px-2 text-xs-right" xs2 v-if="!xsScreen">
         <l-morse-click-input v-model="passwordInput">

@@ -1,10 +1,10 @@
 export default {
   appName: {
-    full: '平安校园智慧通行管理系统',
+    full: '平安校园车辆违章管理系统',
     // full: 'LAdmin',
     subTitle: '电子科技大学',
     // subTitle: 'Material Design',
-    attr: '平安成电智慧通行',
+    attr: '平安成电违章管理',
     // full path
     logoPath: '',
   },
@@ -38,6 +38,10 @@ export default {
     'edit': 'mdi-pencil',
     'folder': 'mdi-folder',
     'chevronRight': 'mdi-chevron-right',
-    'details': 'mdi-dots-horizontal'
+    'details': 'mdi-dots-horizontal',
+    'title': 'mdi-format-title',
+    'level': 'mdi-numeric',
+    'parkingLot': 'mdi-parking',
+    'controller': 'mdi-navigation'
   },
 }

@@ -134,6 +134,7 @@ let navDrawerItems = [
     ]
   },
   {
+    hidden: true,
     icon: 'mdi-parking',
     label: '停车场区',
     development: true,
@@ -211,6 +212,7 @@ let navDrawerItems = [
     ]
   },
   {
+    hidden: true,
     icon: 'mdi-currency-usd',
     label: '停车缴费',
     development: true,
@@ -224,7 +226,7 @@ let navDrawerItems = [
     ]
   },
   {
-    access: 'PassControl',
+    // access: 'PassControl',
     icon: 'mdi-bus-clock',
     label: '通行管控',
     children: [
@@ -234,9 +236,9 @@ let navDrawerItems = [
         to: '/pass-authority',
       },
       {
-        access: 'Blacklist',
+        // access: 'Blacklist',
         label: '冻结车牌管理',
-        to: '/blacklist'
+        to: '/pass/blacklist'
       },
     ]
   },
@@ -259,6 +261,7 @@ let navDrawerItems = [
         to: '/violation/rule'
       },
       {
+        hidden: true,
         development: true,
         access: 'Area',
         label: '违章区域管理',
@@ -273,7 +276,7 @@ let navDrawerItems = [
     ]
   },
   {
-    access: 'Message',
+    // access: 'Message',
     icon: 'mdi-message-bulleted',
     label: '消息管理',
     children: [
@@ -289,9 +292,9 @@ let navDrawerItems = [
         to: '/manual-send'
       },
       {
-        access: 'Log',
+        // access: 'Log',
         label: '消息日志查询',
-        to: '/message-log'
+        to: '/message/history'
       }
     ]
   },
@@ -313,10 +316,10 @@ let navDrawerItems = [
     ]
   },
   {
-    access: 'PassSimulation',
+    // access: 'PassSimulation',
     icon: 'mdi-car',
     label: '通行模拟',
-    to: '/imitate',
+    to: '/pass/simulation',
     children: [],
   }
 

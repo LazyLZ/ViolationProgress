@@ -112,13 +112,13 @@
               </v-card>
             </v-slide-y-transition>
           </v-layout>
-          <v-layout class="pt-4" justify-center>
-            <v-btn :disabled="loginLoading"
-                   @click="loginType = loginType === 'account'?'portal':'account', resetLoginError()"
-                   color="primary" flat>
-              {{loginType === 'account'? 'portal账号':'用户账号'}}登录
-            </v-btn>
-          </v-layout>
+          <!--<v-layout class="pt-4" justify-center>-->
+            <!--<v-btn :disabled="loginLoading"-->
+                   <!--@click="loginType = loginType === 'account'?'portal':'account', resetLoginError()"-->
+                   <!--color="primary" flat>-->
+              <!--{{loginType === 'account'? 'portal账号':'用户账号'}}登录-->
+            <!--</v-btn>-->
+          <!--</v-layout>-->
         </v-container>
         <v-container align-center fill-height v-else>
           <v-layout align-center class="pt-4" column style="height: 200px">

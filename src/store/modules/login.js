@@ -121,35 +121,33 @@ const mutations = {
 
 const actions = {
   async login ({dispatch, commit}, {loginId, password, verifyKey, type}) {
-    // let message = {
-    //   url: type === 'portal' ? '/shiroApi/auth/thirdpart/login?pipe=uestc-portal' : '/shiroApi/auth',
-    //   method: 'post',
-    //   data: {
-    //     'username': loginId,
-    //     'password': password,
-    //     'verifyKey': verifyKey
-    //   },
-    //   timeout: 5000,
-    // }
-    // let {Authorization, name, username} = await dispatch('getDataFromApi', message, {root: true})
-    // if (!Authorization) {
-    //   throw new LError('该用户未授权', -1)
-    // }
-    // let loginInfo = new LoginInfo({
-    //   token: Authorization,
-    //   name: name,
-    //   id: username,
-    //   role: ''
-    // })
-    // commit('saveInfo', loginInfo)
-    // console.log('login', loginInfo.name)
+    let form = new FormData()
+    form.append('username', loginId)
+    form.append('password', password)
+    let message = {
+      url: type === 'portal' ? '/shiroApi/auth/thirdpart/login?pipe=uestc-portal' : '/api/login',
+      method: 'post',
+      data: form,
+      timeout: 5000,
+    }
+    let {token, id, username, role} = await dispatch('getDataFromApi', message, {root: true})
+    if (!token) {
+      throw new LError('该用户未授权', -1)
+    }
     let loginInfo = new LoginInfo({
-      token: '__TEST__',
-      name: 'TEST',
-      id: '__TEST_ACCOUNT__',
-      role: 'admin'
+      token: token,
+      name: username,
+      id: id,
     })
     commit('saveInfo', loginInfo)
+    // console.log('login', loginInfo.name)
+    // let loginInfo = new LoginInfo({
+    //   token: '__TEST__',
+    //   name: 'TEST',
+    //   id: '__TEST_ACCOUNT__',
+    //   role: 'admin'
+    // })
+    // commit('saveInfo', loginInfo)
     return loginInfo
     // your login dispatch
     // throw error when login failed
@@ -250,26 +248,26 @@ const actions = {
     return role
   },
   async logout ({dispatch, commit}, silent = false) {
-    // try {
-    //   if (!silent) {
-    //     await dispatch('getDataFromApi', {
-    //       method: 'get',
-    //       url: '/shiroApi/logout'
-    //     }, {root: true})
-    //     // your logout dispatch
-    //   }
-    // }
-    // catch (e) {
-    //   // throw e
-    // }
-    // finally {
-    //   commit('deleteInfo')
-    //   commit('clearInit')
-    //   commit('$L/changeTab', [], {root: true})
-    // }
-    commit('deleteInfo')
-    commit('clearInit')
-    commit('$L/changeTab', [], {root: true})
+    try {
+      if (!silent) {
+        await dispatch('getDataFromApi', {
+          method: 'post',
+          url: '/api/logout'
+        }, {root: true})
+        // your logout dispatch
+      }
+    }
+    catch (e) {
+      // throw e
+    }
+    finally {
+      commit('deleteInfo')
+      commit('clearInit')
+      commit('$L/changeTab', [], {root: true})
+    }
+    // commit('deleteInfo')
+    // commit('clearInit')
+    // commit('$L/changeTab', [], {root: true})
     return true
   },
   async logoutCount ({dispatch, commit}, {second, reason}) {

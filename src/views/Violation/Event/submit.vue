@@ -1,12 +1,14 @@
 <template>
   <l-layout :layout="['xs12','md10']">
-    <vehicle-viewer class="mb-4" :vehicle="event.vehicle"></vehicle-viewer>
+    <vehicle-viewer :loading="vehicleLoading" :vehicle="event.vehicle" class="mb-4"
+                    v-if="hasVehicleInfo"></vehicle-viewer>
     <v-card>
       <v-card-title style="height: 64px">
         <span class="title pl-2">违章事件上报</span>
         <span class="pl-4 grey--text">{{roleStrMap[$route.query.role]}}</span>
       </v-card-title>
       <v-card-text>
+        <!--//{{test.name}}//-->
         <v-container class="pt-0" fluid grid-list-md>
           <v-subheader>违章基本信息</v-subheader>
           <v-form ref="event" v-model="valid">
@@ -28,17 +30,13 @@
                   v-model="event[result].area"
                 ></v-select>
               </v-flex>
-              <v-flex key="rule" xs12>
-                <v-select
+              <v-flex key="rule" v-if="!isTrafficAdmin" xs12>
+                <l-select-violation-rule
                   :items="ruleList"
                   :rules="$rules.required('必须选择违章类型')"
-                  item-text="name"
-                  item-value="id"
                   label="违章类型"
-                  prepend-icon="$vuetify.icons.description"
-                  return-object
                   v-model="event[result].type"
-                ></v-select>
+                ></l-select-violation-rule>
               </v-flex>
               <!--文字信息描述-->
               <v-flex xs12>
@@ -56,7 +54,10 @@
           <v-subheader>违章取证</v-subheader>
           <v-layout wrap>
             <v-flex xs12>
-              <l-image-placeholder></l-image-placeholder>
+              <l-image-view-dialog :key="i" v-for="(image, i) in images">
+                <l-image-placeholder :src="image.data" slot="activator"></l-image-placeholder>
+              </l-image-view-dialog>
+              <l-image-placeholder v-if="images.length === 0"></l-image-placeholder>
             </v-flex>
             <v-flex xs12>
               <l-select-file>
@@ -82,11 +83,30 @@ import {mapState} from 'vuex'
 import LImagePlaceholder from '../../../components/Image/LImagePlaceholder'
 import LSelectFile from '../../../components/Inputs/LSelectFile'
 import VehicleViewer from '../../../components/vehicleViewer'
+import LSelectViolationRule from '../../../components/Inputs/LSelectViolationRule'
+import {Vehicle, ViolationRule, Evidence} from '../../../object'
+import LImageViewDialog from '../../../components/Image/LImageViewDialog'
 
 export default {
   name: 'ViolationEventSubmit',
-  components: {VehicleViewer, LSelectFile, LImagePlaceholder, LPlatePicker, LLayout},
+  components: {
+    LImageViewDialog,
+    LSelectViolationRule,
+    VehicleViewer,
+    LSelectFile,
+    LImagePlaceholder,
+    LPlatePicker,
+    LLayout
+  },
   data: () => ({
+    hasVehicleInfo: false,
+    test: new ViolationRule({
+      'id': 6,
+      'name': '毒驾1',
+      'serious': null,
+      'code': '1-2-1'
+    }),
+    vehicleLoading: false,
     valid: false,
     event: null,
     result: '',
@@ -102,12 +122,23 @@ export default {
     }
   }),
   computed: {
+    isTrafficAdmin () {
+      return this.$route.query.role === 'TRAFFIC_ADMIN'
+    },
     ...mapState('violation', [
       'areaList',
       'ruleList'
     ]),
+    images () {
+      return this.event.evidenceList.map(e => e.type === Evidence.IMAGE && e.data)
+    }
   },
   watch: {
+    'event.plate' (val) {
+      if (this.$rules.reg.PLATE_PATTERN.test(val)) {
+        this.getVehicle()
+      }
+    },
     '$route' (to) {
       if (to.name === 'ViolationEventSubmit') {
         this.result = this.eventResultMap[this.$route.query.role]
@@ -117,6 +148,27 @@ export default {
   methods: {
     submitEvent () {
       console.log('submit', this.event)
+    },
+    async getVehicle () {
+      try {
+        this.vehicleLoading = true
+        let v = await this.$store.dispatch('pass/getVehicle', {plate: this.event.plate})
+        if (v) {
+          this.event.vehicle = v
+          this.hasVehicleInfo = true
+        }
+        else {
+          this.hasVehicleInfo = false
+          this.event.vehicle = new Vehicle()
+        }
+        // console.log('get v', v)
+      }
+      catch (e) {
+        this.$alert('error', {message: e.message})
+      }
+      finally {
+        this.vehicleLoading = false
+      }
     }
   },
   created () {

@@ -12,7 +12,8 @@ import {LError} from './Error'
 import {
   ViolationEvent,
   ViolationRule,
-  Result
+  Result,
+  Evidence
 } from './Violation'
 
 import {
@@ -30,5 +31,6 @@ export {
   ViolationEvent,
   Vehicle,
   ViolationRule,
-  Result
+  Result,
+  Evidence
 }

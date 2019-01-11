@@ -365,12 +365,23 @@ export default [
             },
           },
           {
-            name: 'ViolationEventHandle',
-            path: ':plate/handle',
+            name: 'ViolationEventPreliminary',
+            path: ':plate/handle/preliminary',
             component: () => import(/* webpackChunkName: "violation" */ '../views/Violation/Event/handle'),
             props: true,
             meta: {
-              label: '处理事件',
+              label: '初步处理',
+              subText: 'params.plate',
+              cacheKey: 'query.id',
+            },
+          },
+          {
+            name: 'ViolationEventFinal',
+            path: ':plate/handle',
+            component: () => import(/* webpackChunkName: "violation" */ '../views/Violation/Event/finalHandle'),
+            props: true,
+            meta: {
+              label: '最终确认',
               subText: 'params.plate',
               cacheKey: 'query.id',
             },
@@ -429,6 +440,62 @@ export default [
           }
         ]
       },
+      {
+        name: 'ViolationHistory',
+        path: 'history',
+        component: () => import(/* webpackChunkName: "violation" */ '../views/Violation/History/history'),
+        meta: {
+          label: '违章历史查询',
+        },
+      }
+    ]
+  },
+  /* -------------- 消息管理 ----------- */
+  {
+    name: 'MessageManagement',
+    path: '/message',
+    component: Main,
+    meta: {
+      disabled: true,
+      label: '消息管理',
+    },
+    children: [
+      {
+        name: 'MessageSendHistory',
+        path: 'history',
+        component: () => import(/* webpackChunkName: "message" */ '../views/Message/History/history'),
+        meta: {
+          label: '发信历史',
+        },
+      }
+    ]
+  },
+  /* -------------- 通行管控 ----------- */
+  {
+    name: 'PassControl',
+    path: '/pass',
+    component: Main,
+    meta: {
+      disabled: true,
+      label: '通行管控',
+    },
+    children: [
+      {
+        name: 'PassSimulation',
+        path: 'simulation',
+        component: () => import(/* webpackChunkName: "pass" */ '../views/Pass/Simulation/passSimulation'),
+        meta: {
+          label: '通行模拟',
+        },
+      },
+      {
+        name: 'BlackList',
+        path: 'blacklist',
+        component: () => import(/* webpackChunkName: "pass" */ '../views/Pass/Blacklist/blacklist'),
+        meta: {
+          label: '冻结车牌管理',
+        },
+      }
     ]
   },
   /* -------------- 404 -------------- */

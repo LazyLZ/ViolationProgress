@@ -16,6 +16,9 @@ import rules from './utils/rules'
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
 Vue.prototype.$rules = rules
+Vue.prototype.$alert = function (type = 'error', config = {}) {
+  return store.dispatch('alert', {type: type, ...config})
+}
 Vue.prototype.$L = {
   cfg,
   F

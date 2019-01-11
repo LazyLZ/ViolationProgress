@@ -29,7 +29,7 @@
         </v-tooltip>
         <v-tooltip bottom>
           <v-btn
-            class="py-0 my-0"
+            @click="goNew(items[0])"
             icon
             slot="activator"
           >
@@ -90,7 +90,7 @@
                       <div
                         :class="[header.monospaced? 'monospaced':'']"
                         :style="header.monospaced? {'width': header.monospaced + '!important'}:''"
-                        v-if="tdItemValue(p.item[header.value], header) || !header.placeholder"
+                        v-if="hasValue(tdItemValue(p.item[header.value], header)) || !header.placeholder"
                       >
                         <span
                           :class="[header.clickable?'primary--text':'']"
@@ -113,19 +113,24 @@
                   </v-btn>
                   <v-list dense>
                     <v-list-tile
+                      @click="goDetails(p.item)"
                     >
                       <v-list-tile-title class="pr-1">
                         <v-icon class="pr-3" small>$vuetify.icons.details</v-icon>
                         查看规则
                       </v-list-tile-title>
                     </v-list-tile>
-                    <v-list-tile>
+                    <v-list-tile
+                      @click="goNew(p.item)"
+                    >
                       <v-list-tile-title class="pr-1">
                         <v-icon class="pr-3" small>$vuetify.icons.add</v-icon>
                         添加细分规则
                       </v-list-tile-title>
                     </v-list-tile>
-                    <v-list-tile>
+                    <v-list-tile
+                      @click="deleteRule(p.item)"
+                    >
                       <v-list-tile-title class="pr-1">
                         <v-icon class="pr-3" small>$vuetify.icons.delete</v-icon>
                         删除规则
@@ -163,12 +168,17 @@ export default {
     items: [],
     headers: [
       {text: '规则名称', value: 'name', align: 'left', placeholder: 'N/A'},
-      {text: '上次编辑', value: 'lastEditor', align: 'right', placeholder: 'N/A'},
-      {text: '创建时间', value: 'creationTime', align: 'right', placeholder: 'N/A', f: v => time.stringify(v)},
+      {text: '严重程度', value: 'severity', align: 'right', placeholder: 'N/A'},
+      // {text: '创建时间', value: 'creationTime', align: 'right', placeholder: 'N/A', f: v => time.stringify(v)},
       {text: '', value: '', align: 'right', width: '80px', sortable: false}
     ]
   }),
   computed: {
+    hasValue () {
+      return (v) => {
+        return v !== undefined && v !== null && v !== ''
+      }
+    },
     rules: {
       get () {
         return this.$store.state.violation.ruleList
@@ -273,6 +283,32 @@ export default {
         params: {name: item.name},
         query: {id: item.id}
       })
+    },
+    goNew (item) {
+      if (this.$store.getters.getTab({name: 'NewViolationRule'})) {
+        this.$store.dispatch('confirm', {
+          title: '提示',
+          icon: '$vuetify.icons.alert',
+          iconColor: 'warning',
+          text: '请您完成当前规则提交后再添加新规则',
+          disableCancel: true
+        })
+      }
+      else {
+        this.$router.push({
+          name: 'NewViolationRule',
+          query: {parent: item.code}
+        })
+      }
+    },
+    goEdit (item) {
+      this.$router.push({
+        name: 'EditViolationRule',
+        params: {name: item.name},
+        query: {id: item.id}
+      })
+    },
+    deleteRule (item) {
     }
   },
   created () {
